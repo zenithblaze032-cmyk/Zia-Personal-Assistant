@@ -55,7 +55,10 @@ async def _say_via_edge_tts_async(text: str) -> None:
     with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as fp:
         temp_path = fp.name
     try:
-        c = edge_tts.Communicate(text, JARVIS_TTS_VOICE)
+        import os
+        rate = os.environ.get("JARVIS_TTS_RATE", "+5%")
+        pitch = os.environ.get("JARVIS_TTS_PITCH", "-10Hz")
+        c = edge_tts.Communicate(text, JARVIS_TTS_VOICE, rate=rate, pitch=pitch)
         await c.save(temp_path)
         
         device = miniaudio.PlaybackDevice()

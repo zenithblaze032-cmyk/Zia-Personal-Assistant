@@ -166,10 +166,12 @@ class JarvisTTS:
           .sample_channels    — 1 (mono) or 2 (stereo)
         """
         # Collect all audio chunks.
+        # Collect all audio chunks.
         all_pcm: list[bytes] = []
         sample_rate: int = 22050
         n_channels: int = 1
-
+        
+        # The Python piper-tts module currently does not support length_scale in synthesize()
         for chunk in self._voice.synthesize(text):
             all_pcm.append(chunk.audio_int16_bytes)
             sample_rate = chunk.sample_rate
