@@ -5,7 +5,10 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 # Load .env
-load_dotenv(Path(__file__).resolve().parent.parent / ".env")
+def reload_settings():
+    load_dotenv(Path(__file__).resolve().parent.parent / ".env", override=True)
+    
+reload_settings()
 
 def _env_float(name: str, default: float) -> float:
     raw = (os.environ.get(name) or "").strip()

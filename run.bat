@@ -25,24 +25,41 @@ if not exist "%PYTHON_EXE%" (
     where py >nul 2>&1
     if %ERRORLEVEL% EQU 0 (
         set PYTHON_EXE=py
-        goto :run
+        goto :setup_venv
     )
     where python >nul 2>&1
     if %ERRORLEVEL% EQU 0 (
         set PYTHON_EXE=python
-        goto :run
+        goto :setup_venv
     )
-    echo  [ERROR] Python not found at C:\Python314\python.exe
+    echo  [ERROR] Python not found at C:\Python314\python.exe or in PATH.
     echo  Install Python 3 or update PYTHON_EXE in this file.
     pause
     exit /b 1
 )
 
+:setup_venv
+if not exist "venv\Scripts\python.exe" (
+    echo  [SETUP] Creating virtual environment...
+    "%PYTHON_EXE%" -m venv venv
+    if %ERRORLEVEL% NEQ 0 (
+        echo  [ERROR] Failed to create virtual environment.
+        pause
+        exit /b 1
+    )
+    echo  [SETUP] Installing dependencies...
+    venv\Scripts\python.exe -m pip install --upgrade pip -q
+    venv\Scripts\python.exe -m pip install -r requirements.txt
+) else (
+    :: Quick check for updates
+    venv\Scripts\python.exe -m pip install -r requirements.txt -q
+)
+
 :run
-echo  Python  : %PYTHON_EXE%
+echo  Python  : venv\Scripts\python.exe
 echo  Script  : %~dp0jarvis.py
 echo.
-cmd /c ""%PYTHON_EXE%" "%~dp0jarvis.py""
+cmd /c "venv\Scripts\python.exe "%~dp0jarvis.py""
 
 if %ERRORLEVEL% NEQ 0 (
     echo.

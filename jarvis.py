@@ -10,6 +10,8 @@ from core.context import Context
 from core.router import Router
 from core.state import AssistantState, st
 from core.tts import say_text
+import pystray
+from PIL import Image, ImageDraw
 
 logging.basicConfig(
     level=logging.INFO,
@@ -101,6 +103,23 @@ def _dispatch(text: str) -> None:
     else:
         ctx.say("I don't know that one yet.")
 
+def setup_tray():
+    try:
+        image = Image.new('RGB', (64, 64), color=(0, 0, 0))
+        dc = ImageDraw.Draw(image)
+        dc.rectangle((16, 16, 48, 48), fill=(0, 255, 0))
+        
+        def on_exit(icon, item):
+            icon.stop()
+            _go_shutdown()
+            
+        icon = pystray.Icon("Jarvis", image, "Jarvis", menu=pystray.Menu(
+            pystray.MenuItem("Exit", on_exit)
+        ))
+        threading.Thread(target=icon.run, daemon=True).start()
+    except Exception as e:
+        log.error(f"Failed to setup tray: {e}")
+
 def main():
     import sounddevice as sd
     input_idx = sd.default.device[0]
@@ -118,6 +137,7 @@ def main():
     log.info("JARVIS is listening...")
 
     init_asr(_wake_word_hit, _strip_wake_prefix, _dispatch, _go_sleep)
+    setup_tray()
     
     try:
         listen_loop(input_idx)

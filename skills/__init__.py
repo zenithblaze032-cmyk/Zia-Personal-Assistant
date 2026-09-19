@@ -20,11 +20,11 @@ log = logging.getLogger("jarvis.skills")
 
 def register_all(router: Router) -> None:
     """Register every skill module with the router, in priority order."""
-    from skills import apps, media, system, web
+    from skills import apps, media, system, web, notes
 
     # Registration order matters: first match wins.
     # More specific patterns should come before broad ones.
-    for module in (web, system, media, apps):
+    for module in (web, system, media, apps, notes):
         try:
             module.register(router)
             log.debug("Registered skill module: %s", module.__name__)
