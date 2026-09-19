@@ -69,4 +69,4 @@ JARVIS_EXIT_PHRASE = (os.environ.get("JARVIS_EXIT_PHRASE") or "Shutting down. Go
 JARVIS_WELCOME_ENABLED = (os.environ.get("JARVIS_WELCOME_ENABLED") or "False").strip().lower() in ("true", "1", "yes")
 JARVIS_SPEAK_DELAY_S = _env_float("JARVIS_SPEAK_DELAY_S", 1.0)
 JARVIS_TTS_VOICE = (os.environ.get("JARVIS_TTS_VOICE") or "en-GB-RyanNeural").strip()
-JARVIS_PIPER_VOICE = (os.environ.get("JARVIS_PIPER_VOICE") or "en_GB-alan-high").strip()
+JARVIS_PIPER_VOICE = (os.environ.get("JARVIS_PIPER_VOICE") or "en_GB-alan-medium").strip()
