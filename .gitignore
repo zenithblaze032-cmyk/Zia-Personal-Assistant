@@ -1,0 +1,11 @@
+.env
+.cache/
+.venv
+__pycache__/
+.vscode/
+models/
+graphify-out/
+*.wav
+*.onnx
+*.onnx.json
+*.zip
