@@ -30,16 +30,16 @@ log = logging.getLogger("jarvis.tts")
 # ---------------------------------------------------------------------------
 _HERE = Path(__file__).resolve().parent.parent          # project root
 MODELS_DIR = _HERE / "models" / "voice"
-MODEL_ONNX = MODELS_DIR / "jarvis-high.onnx"
-MODEL_JSON  = MODELS_DIR / "jarvis-high.onnx.json"
+MODEL_ONNX = MODELS_DIR / "en_GB-alan-medium.onnx"
+MODEL_JSON  = MODELS_DIR / "en_GB-alan-medium.onnx.json"
 
 MODEL_ONNX_URL = (
-    "https://huggingface.co/jgkawell/jarvis/resolve/main"
-    "/en/en_GB/jarvis/high/jarvis-high.onnx"
+    "https://huggingface.co/rhasspy/piper-voices/resolve/main"
+    "/en/en_GB/alan/medium/en_GB-alan-medium.onnx"
 )
 MODEL_JSON_URL = (
-    "https://huggingface.co/jgkawell/jarvis/resolve/main"
-    "/en/en_GB/jarvis/high/jarvis-high.onnx.json"
+    "https://huggingface.co/rhasspy/piper-voices/resolve/main"
+    "/en/en_GB/alan/medium/en_GB-alan-medium.onnx.json"
 )
 
 
@@ -78,9 +78,9 @@ def ensure_model_files() -> None:
     """Download ONNX model and JSON config if they are missing."""
     missing = []
     if not MODEL_ONNX.exists():
-        missing.append((MODEL_ONNX_URL, MODEL_ONNX, "jarvis-high.onnx (~85 MB)"))
+        missing.append((MODEL_ONNX_URL, MODEL_ONNX, "en_GB-alan-medium.onnx (~50 MB)"))
     if not MODEL_JSON.exists():
-        missing.append((MODEL_JSON_URL, MODEL_JSON, "jarvis-high.onnx.json"))
+        missing.append((MODEL_JSON_URL, MODEL_JSON, "en_GB-alan-medium.onnx.json"))
 
     if not missing:
         return
@@ -137,7 +137,7 @@ class JarvisTTS:
             raise ImportError(
                 "piper-tts is not installed. Run: pip install piper-tts"
             ) from exc
-        log.info("JARVIS TTS ready (Piper / en_GB jarvis-high).")
+        log.info("JARVIS TTS ready (Piper / en_GB-alan-medium).")
 
     # ------------------------------------------------------------------
 
