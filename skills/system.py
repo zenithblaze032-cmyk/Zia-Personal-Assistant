@@ -12,12 +12,12 @@ if TYPE_CHECKING:
     from core.context import Context
     from core.router import Router
 
-log = logging.getLogger("jarvis.skills.system")
+log = logging.getLogger("Zia.skills.system")
 
 # ---------------------------------------------------------------------------
 # Volume / media key codes
 # ---------------------------------------------------------------------------
-VK_VOLUME_UP   = 0xAF
+VK_VOLUME_UP = 0xAF
 VK_VOLUME_DOWN = 0xAE
 VK_VOLUME_MUTE = 0xAD
 KEYEVENTF_KEYUP = 0x0002
@@ -49,10 +49,11 @@ def _handle_date(match: re.Match, ctx: Context) -> None:
 def _handle_screenshot(match: re.Match, ctx: Context) -> None:
     try:
         from PIL import ImageGrab  # type: ignore[import]
-        pic_dir = Path.home() / "Pictures" / "Jarvis"
+        pic_dir = Path.home() / "Pictures" / "Zia"
         pic_dir.mkdir(parents=True, exist_ok=True)
-        ts = datetime.datetime.now(datetime.timezone.utc).astimezone().strftime("%Y%m%d_%H%M%S")
-        path = pic_dir / f"Jarvis_{ts}.png"
+        ts = datetime.datetime.now(
+            datetime.timezone.utc).astimezone().strftime("%Y%m%d_%H%M%S")
+        path = pic_dir / f"Zia_{ts}.png"
         img = ImageGrab.grab()
         img.save(str(path))
         ctx.say("Screenshot saved, sir.")
@@ -106,7 +107,8 @@ def _handle_help(match: re.Match, ctx: Context) -> None:
 PATTERNS = [
     (r"\bwhat(?:'s| is) the time\b|\bwhat time is it\b|\bthe time\b|\btime\b$", _handle_time),
     (r"\bwhat(?:'s| is) the date\b|\bwhat day is it\b|\bwhat(?:'s| is) today\b|\bdate\b$", _handle_date),
-    (r"\bscreenshot\b|\btake a screenshot\b|\bgrab (a |the )?screenshot\b", _handle_screenshot),
+    (r"\bscreenshot\b|\btake a screenshot\b|\bgrab (a |the )?screenshot\b",
+     _handle_screenshot),
     (r"\block\b.*(pc|screen|computer|workstation)|\block it\b", _handle_lock),
     (r"\bvolume up\b|\bturn it up\b|\blouder\b|\bincrease (the )?volume\b", _handle_volume_up),
     (r"\bvolume down\b|\bturn it down\b|\bquieter\b|\bdecrease (the )?volume\b|\blower (the )?volume\b", _handle_volume_down),

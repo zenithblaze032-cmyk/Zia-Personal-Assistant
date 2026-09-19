@@ -10,15 +10,15 @@ if TYPE_CHECKING:
     from core.context import Context
     from core.router import Router
 
-log = logging.getLogger("jarvis.skills.media")
+log = logging.getLogger("Zia.skills.media")
 
 # Windows virtual key codes for global media controls.
 # These work across Spotify, Chrome, VLC, and any app that respects media keys.
 VK_MEDIA_PLAY_PAUSE = 0xB3
 VK_MEDIA_NEXT_TRACK = 0xB0
 VK_MEDIA_PREV_TRACK = 0xB1
-VK_MEDIA_STOP       = 0xB2
-KEYEVENTF_KEYUP     = 0x0002
+VK_MEDIA_STOP = 0xB2
+KEYEVENTF_KEYUP = 0x0002
 
 
 def _send_media_key(vk: int) -> None:

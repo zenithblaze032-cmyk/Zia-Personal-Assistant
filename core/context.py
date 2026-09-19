@@ -5,10 +5,10 @@ from collections.abc import Callable
 
 class Context:
     """
-    Passed to every skill handler. Completely decouples skills from jarvis.py.
+    Passed to every skill handler. Completely decouples skills from Zia.py.
 
     Skills must only use ctx.say(), ctx.sleep(), ctx.shutdown().
-    They must NOT import anything from core/ or jarvis.py directly.
+    They must NOT import anything from core/ or Zia.py directly.
     """
 
     def __init__(
@@ -26,9 +26,9 @@ class Context:
         self._say(text)
 
     def sleep(self) -> None:
-        """Tell Jarvis to go back to ASLEEP state."""
+        """Tell Zia to go back to ASLEEP state."""
         self._sleep()
 
     def shutdown(self) -> None:
-        """Clean up and exit the Jarvis process."""
+        """Clean up and exit the Zia process."""
         self._shutdown()

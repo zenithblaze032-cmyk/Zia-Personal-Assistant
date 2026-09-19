@@ -1,5 +1,5 @@
 @echo off
-title JARVIS - Voice Assistant
+title Zia - Voice Assistant
 color 0A
 cls
 echo.
@@ -7,13 +7,13 @@ echo  ============================================================
 echo    J A R V I S  -  Voice-Activated Workspace Launcher
 echo  ============================================================
 echo.
-echo  Say "JARVIS" to launch your workspace:
+echo  Say "Zia" to launch your workspace:
 echo.
 echo    [LEFT]   LeetCode
 echo    [CENTRE] YouTube Playlist
 echo    [RIGHT]  VS Code + Terminal
 echo.
-echo  Press Ctrl+C or say "shut down Jarvis" to exit.
+echo  Press Ctrl+C or say "shut down Zia" to exit.
 echo  ============================================================
 echo.
 
@@ -57,13 +57,13 @@ if not exist "venv\Scripts\python.exe" (
 
 :run
 echo  Python  : venv\Scripts\python.exe
-echo  Script  : %~dp0jarvis.py
+echo  Script  : %~dp0Zia.py
 echo.
-cmd /c "venv\Scripts\python.exe "%~dp0jarvis.py""
+cmd /c "venv\Scripts\python.exe "%~dp0Zia.py""
 
 if %ERRORLEVEL% NEQ 0 (
     echo.
-    echo  [ERROR] Jarvis exited with error code %ERRORLEVEL%.
+    echo  [ERROR] Zia exited with error code %ERRORLEVEL%.
     echo  Check the output above for details.
     pause
 )

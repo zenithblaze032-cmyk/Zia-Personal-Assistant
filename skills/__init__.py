@@ -1,5 +1,5 @@
 """
-Jarvis Skills Package
+Zia Skills Package
 =====================
 Importing this package and calling register_all(router) loads every skill
 into the router. To add a new skill:
@@ -15,7 +15,7 @@ if TYPE_CHECKING:
 
 import logging
 
-log = logging.getLogger("jarvis.skills")
+log = logging.getLogger("Zia.skills")
 
 
 def register_all(router: Router) -> None:
@@ -29,4 +29,5 @@ def register_all(router: Router) -> None:
             module.register(router)
             log.debug("Registered skill module: %s", module.__name__)
         except Exception:
-            log.exception("Failed to register skill module '%s' — skipping.", module.__name__)
+            log.exception(
+                "Failed to register skill module '%s' — skipping.", module.__name__)

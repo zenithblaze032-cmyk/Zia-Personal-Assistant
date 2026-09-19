@@ -1,12 +1,13 @@
 """
-core/piper_tts.py — JARVIS Local Offline TTS Module
+core/piper_tts.py — Zia Local Offline TTS Module
 =============================================
-Uses Piper TTS with the open-source JARVIS voice model (en_GB/jarvis/high)
-from HuggingFace: https://huggingface.co/jgkawell/jarvis
+Uses Piper TTS with offline voice models from the
+rhasspy/piper-voices catalog on HuggingFace:
+https://huggingface.co/rhasspy/piper-voices
 
 Usage:
-    from core.piper_tts import JarvisTTS
-    tts = JarvisTTS()
+    from core.piper_tts import ZiaTTS
+    tts = ZiaTTS()
     tts.speak("All systems online, sir.")
 
 Standalone test:
@@ -25,7 +26,7 @@ from pathlib import Path
 import numpy as np
 import sounddevice as sd
 
-log = logging.getLogger("jarvis.tts")
+log = logging.getLogger("Zia.tts")
 
 # ---------------------------------------------------------------------------
 # Voice catalog & model paths
@@ -33,14 +34,14 @@ log = logging.getLogger("jarvis.tts")
 _HERE = Path(__file__).resolve().parent.parent          # project root
 MODELS_DIR = _HERE / "models" / "voice"
 
-# Default voice (JARVIS-style British male)
+# Default voice (Zia-style British male)
 DEFAULT_PIPER_VOICE = "en_GB-alan-medium"
 
 # Curated top-5 male & female Piper voices.
 # All are downloadable offline models from rhasspy/piper-voices (HuggingFace).
 #
 # MALE
-# ── en_GB-alan-medium          — deep, formal British butler (classic JARVIS feel) ★ default
+# ── en_GB-alan-medium          — deep, formal British butler (classic Zia feel) ★ default
 # ── en_US-ryan-high            — warm, confident American male (movie-trailer tone)
 # ── en_GB-northern_english_male-medium — rough Northern English male (Batman-esque)
 # ── en_US-joe-medium           — gravelly, laid-back American male
@@ -80,7 +81,8 @@ def _voice_urls(voice_name: str) -> tuple[str, str]:
     Voice names follow the Piper convention '<locale>-<speaker>-<quality>',
     e.g. 'en_GB-alan-medium' → locale=en_GB, speaker=alan, quality=medium.
     """
-    m = re.match(r"^(?P<locale>[a-z]{2}_[A-Z]{2})-(?P<speaker>.+)-(?P<quality>low|medium|high)$", voice_name)
+    m = re.match(
+        r"^(?P<locale>[a-z]{2}_[A-Z]{2})-(?P<speaker>.+)-(?P<quality>low|medium|high)$", voice_name)
     if not m:
         raise ValueError(
             f"Invalid Piper voice name: {voice_name!r}. "
@@ -102,12 +104,11 @@ def list_voices() -> None:
     for v in FEMALE_VOICES:
         print(f"    • {v}")
     print(
-        "\n  To switch voices, set JARVIS_PIPER_VOICE in .env, e.g.:\n"
-        "      JARVIS_PIPER_VOICE=en_US-ryan-high\n"
+        "\n  To switch voices, set Zia_PIPER_VOICE in .env, e.g.:\n"
+        "      Zia_PIPER_VOICE=en_US-ryan-high\n"
         "  (any Piper voice from rhasspy/piper-voices works — it will be\n"
         "   downloaded automatically on first use.)\n"
     )
-
 
 
 # ---------------------------------------------------------------------------
@@ -142,8 +143,8 @@ def _download_file(url: str, dest: Path, label: str) -> None:
 
 
 def _resolve_voice_name() -> str:
-    """Pick the active voice: JARVIS_PIPER_VOICE env → default."""
-    return (os.environ.get("JARVIS_PIPER_VOICE") or DEFAULT_PIPER_VOICE).strip()
+    """Pick the active voice: Zia_PIPER_VOICE env → default."""
+    return (os.environ.get("Zia_PIPER_VOICE") or DEFAULT_PIPER_VOICE).strip()
 
 
 def ensure_model_files(voice_name: str = DEFAULT_PIPER_VOICE) -> None:
@@ -172,12 +173,12 @@ def ensure_model_files(voice_name: str = DEFAULT_PIPER_VOICE) -> None:
 
 
 # ---------------------------------------------------------------------------
-# JarvisTTS class
+# ZiaTTS class
 # ---------------------------------------------------------------------------
 
-class JarvisTTS:
+class ZiaTTS:
     """
-    Offline, local TTS using Piper + the JARVIS voice model.
+    Offline, local TTS using Piper + the Zia voice model.
 
     The model is loaded once at instantiation; `speak()` is thread-safe
     (each call creates its own in-memory audio buffer).
@@ -246,7 +247,7 @@ class JarvisTTS:
         all_pcm: list[bytes] = []
         sample_rate: int = 22050
         n_channels: int = 1
-        
+
         # The Python piper-tts module currently does not support length_scale in synthesize()
         for chunk in self._voice.synthesize(text):
             all_pcm.append(chunk.audio_int16_bytes)
@@ -275,7 +276,8 @@ class JarvisTTS:
         # full speech is audible and the last word isn't clipped mid-playback.
         silence_frames = int(sample_rate * 0.2)
         if pcm_f32.ndim == 2:
-            pad = np.zeros((silence_frames, pcm_f32.shape[1]), dtype=pcm_f32.dtype)
+            pad = np.zeros(
+                (silence_frames, pcm_f32.shape[1]), dtype=pcm_f32.dtype)
         else:
             pad = np.zeros(silence_frames, dtype=pcm_f32.dtype)
         pcm_f32 = np.concatenate([pad, pcm_f32, pad])
@@ -312,7 +314,7 @@ if __name__ == "__main__":
     )
 
     print()
-    print("  JARVIS TTS — Standalone Test")
+    print("  Zia TTS — Standalone Test")
     print("  ─────────────────────────────────────────────")
     print(f"  Active voice: {_resolve_voice_name()}")
     print(f'  Phrase      : "{test_phrase}"')
@@ -322,7 +324,7 @@ if __name__ == "__main__":
         list_voices()
     else:
         try:
-            tts = JarvisTTS()
+            tts = ZiaTTS()
             print("  Speaking …")
             tts.speak(test_phrase)
             print("  Done.")

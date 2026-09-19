@@ -1,3 +1,4 @@
+from core.tts import say_text
 import ctypes
 import logging
 import os
@@ -12,7 +13,6 @@ from pathlib import Path
 from core.config import *
 
 log = logging.getLogger(__name__)
-from core.tts import say_text
 
 
 def _chrome_executable() -> str | None:
@@ -24,7 +24,8 @@ def _chrome_executable() -> str | None:
         ):
             if not base:
                 continue
-            p = os.path.join(base, "Google", "Chrome", "Application", "chrome.exe")
+            p = os.path.join(base, "Google", "Chrome",
+                             "Application", "chrome.exe")
             if os.path.isfile(p):
                 return p
     return shutil.which("google-chrome") or shutil.which("chrome")
@@ -47,7 +48,8 @@ def _win32_sorted_monitor_rects() -> list[tuple[int, int, int, int]]:
                         ctypes.POINTER(RECT), wintypes.LPARAM)
     def _cb(_hm, _hdc, lprc, _lp):
         r = lprc.contents
-        collected.append((int(r.left), int(r.top), int(r.right), int(r.bottom)))
+        collected.append(
+            (int(r.left), int(r.top), int(r.right), int(r.bottom)))
         return True
 
     ctypes.windll.user32.EnumDisplayMonitors(None, None, _cb, 0)
@@ -92,7 +94,8 @@ def _chrome_top_level_browser_hwnds_win32() -> set[int]:
         user32.GetWindowThreadProcessId(hwnd, ctypes.byref(pid))
         if pid.value == 0:
             return True
-        hproc = kernel32.OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, False, pid.value)
+        hproc = kernel32.OpenProcess(
+            PROCESS_QUERY_LIMITED_INFORMATION, False, pid.value)
         if not hproc:
             return True
         try:
@@ -148,7 +151,8 @@ def _snap_hwnd_to_tile_win32(hwnd: int, col: int, total_cols: int, monitor: int 
     SWP_SHOWWINDOW = 0x0040
     SWP_FRAMECHANGED = 0x0020
     user32.ShowWindow(hwnd, SW_RESTORE)
-    user32.SetWindowPos(hwnd, HWND_TOP, x, y, w, h, SWP_SHOWWINDOW | SWP_FRAMECHANGED)
+    user32.SetWindowPos(hwnd, HWND_TOP, x, y, w, h,
+                        SWP_SHOWWINDOW | SWP_FRAMECHANGED)
 
 
 def _tiled_column_bounds(col: int, total_cols: int, monitor: int = 1) -> tuple[int, int, int, int]:
@@ -176,7 +180,8 @@ def _open_url_in_chrome(
             if new_window:
                 args.append("--new-window")
             if window_position is not None:
-                args.append(f"--window-position={window_position[0]},{window_position[1]}")
+                args.append(
+                    f"--window-position={window_position[0]},{window_position[1]}")
             if window_size:
                 args.append(f"--window-size={window_size[0]},{window_size[1]}")
             args.append(u)
@@ -188,7 +193,8 @@ def _open_url_in_chrome(
                 popen_kw["creationflags"] = subprocess.CREATE_NO_WINDOW
             subprocess.Popen(**popen_kw)
         else:
-            log.warning("Chrome not found; opening %s in default browser.", label)
+            log.warning(
+                "Chrome not found; opening %s in default browser.", label)
             webbrowser.open(u)
     except OSError as e:
         log.warning("Could not open %s in Chrome: %s", label, e)
@@ -204,31 +210,36 @@ def _open_chrome_tiled(url: str, label: str, col: int, total_cols: int, monitor:
         window_position=(x, y), window_size=(w, h),
     )
     if sys.platform == "win32":
-        hwnd = _wait_new_chrome_hwnd_win32(before, _chrome_new_window_wait_timeout_s())
+        hwnd = _wait_new_chrome_hwnd_win32(
+            before, _chrome_new_window_wait_timeout_s())
         if hwnd is not None:
             _snap_hwnd_to_tile_win32(hwnd, col, total_cols, monitor)
         else:
-            log.warning("Tiled layout: timed out waiting for Chrome window (%s).", label)
+            log.warning(
+                "Tiled layout: timed out waiting for Chrome window (%s).", label)
 
 
 def open_leetcode_in_chrome(*, tiled: bool = False, tile_col: int = 0,
-                             total_cols: int = 3, monitor: int = 1) -> None:
+                            total_cols: int = 3, monitor: int = 1) -> None:
     if not LEETCODE_URL:
         return
     if tiled and sys.platform == "win32":
-        _open_chrome_tiled(LEETCODE_URL, "LeetCode", tile_col, total_cols, monitor)
+        _open_chrome_tiled(LEETCODE_URL, "LeetCode",
+                           tile_col, total_cols, monitor)
     else:
         _open_url_in_chrome(LEETCODE_URL, new_window=True, label="LeetCode")
 
 
 def open_youtube_playlist_in_chrome(*, tiled: bool = False, tile_col: int = 1,
-                                     total_cols: int = 3, monitor: int = 1) -> None:
+                                    total_cols: int = 3, monitor: int = 1) -> None:
     if not YOUTUBE_PLAYLIST_URL:
         return
     if tiled and sys.platform == "win32":
-        _open_chrome_tiled(YOUTUBE_PLAYLIST_URL, "YouTube playlist", tile_col, total_cols, monitor)
+        _open_chrome_tiled(YOUTUBE_PLAYLIST_URL,
+                           "YouTube playlist", tile_col, total_cols, monitor)
     else:
-        _open_url_in_chrome(YOUTUBE_PLAYLIST_URL, new_window=True, label="YouTube playlist")
+        _open_url_in_chrome(YOUTUBE_PLAYLIST_URL,
+                            new_window=True, label="YouTube playlist")
 
 
 def _vscode_executable() -> str | None:
@@ -275,7 +286,8 @@ def _electron_top_level_main_hwnds_win32(process_name: str) -> set[int]:
         user32.GetWindowThreadProcessId(hwnd, ctypes.byref(pid))
         if pid.value == 0:
             return True
-        hproc = kernel32.OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, False, pid.value)
+        hproc = kernel32.OpenProcess(
+            PROCESS_QUERY_LIMITED_INFORMATION, False, pid.value)
         if not hproc:
             return True
         try:
@@ -348,7 +360,8 @@ def _open_vscode_no_terminal_snap() -> None:
         return
     exe = _vscode_executable()
     if not exe:
-        log.warning("Could not find VS Code (install it or add `code` to PATH).")
+        log.warning(
+            "Could not find VS Code (install it or add `code` to PATH).")
         return
     target = VSCODE_OPEN_PATH
     if not Path(target).exists():
@@ -361,7 +374,8 @@ def _open_vscode_no_terminal_snap() -> None:
     if sys.platform == "win32":
         popen_kw["creationflags"] = subprocess.CREATE_NO_WINDOW
     try:
-        subprocess.Popen([exe, "-n", "--disable-workspace-trust", target], **popen_kw)
+        subprocess.Popen(
+            [exe, "-n", "--disable-workspace-trust", target], **popen_kw)
     except OSError as e:
         log.warning("Could not start VS Code: %s", e)
 
@@ -389,18 +403,21 @@ def _snap_vscode_to_tile_win32(
 def run_workspace_launch(mode: str = "dsa") -> None:
     """Entry point to launch the workspace apps."""
     def _speak_workspace_launched_after_delay() -> None:
-        time.sleep(JARVIS_SPEAK_DELAY_S)
-        say_text(JARVIS_WORKSPACE_LAUNCH_PHRASE)
+        time.sleep(Zia_SPEAK_DELAY_S)
+        say_text(Zia_WORKSPACE_LAUNCH_PHRASE)
 
     total_cols = 3
     monitor = 1
 
     if TILED_LAYOUT_ENABLED and sys.platform == "win32":
         log.info("Launching tiled workspace: LeetCode | YouTube | VS Code")
-        open_leetcode_in_chrome(tiled=True, tile_col=0, total_cols=total_cols, monitor=monitor)
-        open_youtube_playlist_in_chrome(tiled=True, tile_col=1, total_cols=total_cols, monitor=monitor)
-        if JARVIS_WORKSPACE_LAUNCH_PHRASE.strip():
-            threading.Thread(target=_speak_workspace_launched_after_delay, daemon=True).start()
+        open_leetcode_in_chrome(tiled=True, tile_col=0,
+                                total_cols=total_cols, monitor=monitor)
+        open_youtube_playlist_in_chrome(
+            tiled=True, tile_col=1, total_cols=total_cols, monitor=monitor)
+        if Zia_WORKSPACE_LAUNCH_PHRASE.strip():
+            threading.Thread(
+                target=_speak_workspace_launched_after_delay, daemon=True).start()
         before_vscode = _electron_top_level_main_hwnds_win32("code.exe")
         _open_vscode_no_terminal_snap()
         threading.Thread(
@@ -412,12 +429,12 @@ def run_workspace_launch(mode: str = "dsa") -> None:
     else:
         open_leetcode_in_chrome()
         open_youtube_playlist_in_chrome()
-        if JARVIS_WORKSPACE_LAUNCH_PHRASE.strip():
-            threading.Thread(target=_speak_workspace_launched_after_delay, daemon=True).start()
+        if Zia_WORKSPACE_LAUNCH_PHRASE.strip():
+            threading.Thread(
+                target=_speak_workspace_launched_after_delay, daemon=True).start()
         _open_vscode_no_terminal_snap()
 
 
 # ===========================================================================
 # Main — voice keyword listener
 # ===========================================================================
-

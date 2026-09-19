@@ -1,11 +1,11 @@
 # System Architecture
 
-Jarvis is structured as a central listening loop (`jarvis.py`) with a modular skills system.
+Zia is structured as a central listening loop (`Zia.py`) with a modular skills system.
 
 ## Directory Layout
 
 ```
-jarvis.py          ← Main loop: audio capture, wake word, state machine
+Zia.py          ← Main loop: audio capture, wake word, state machine
 core/
   context.py       ← Context object (ctx.say, ctx.sleep, ctx.shutdown)
   router.py        ← Regex-based skill dispatcher
@@ -20,10 +20,10 @@ skills/
 
 ## State Machine
 
-Jarvis has two states:
+Zia has two states:
 
 ```
-ASLEEP ──── "Jarvis" (wake word) ────► AWAKE
+ASLEEP ──── "Zia" (wake word) ────► AWAKE
   ▲                                      │
   │         "Go to sleep"                │ Commands dispatched
   └──────────────────────────────────────┘ to Router
@@ -46,7 +46,7 @@ Microphone (16 kHz)
 
 ## Key Design Decisions
 
-- **Mic muting during TTS**: While Jarvis speaks, the microphone loop is paused + a 1.5s cooldown after — so Jarvis never hears its own voice.
+- **Mic muting during TTS**: While Zia speaks, the microphone loop is paused + a 1.5s cooldown after — so Zia never hears its own voice.
 - **Post-wake cooldown**: After waking up, audio is ignored for 3 seconds so the wake word's own echo doesn't trigger a command.
-- **Final-only dispatch**: Commands only fire on Vosk's *Final* results (not partials) to prevent half-heard words triggering actions.
-- **Error isolation**: Each skill handler is wrapped in try/except inside the Router — a broken skill never crashes Jarvis.
+- **Final-only dispatch**: Commands only fire on Vosk's _Final_ results (not partials) to prevent half-heard words triggering actions.
+- **Error isolation**: Each skill handler is wrapped in try/except inside the Router — a broken skill never crashes Zia.

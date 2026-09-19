@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from core.context import Context
 
-log = logging.getLogger("jarvis.router")
+log = logging.getLogger("Zia.router")
 
 
 class Router:
@@ -34,7 +34,7 @@ class Router:
         Returns False if nothing matched.
 
         All handler exceptions are caught here — a broken skill never
-        crashes Jarvis. The error is logged and ctx.say() delivers a
+        crashes Zia. The error is logged and ctx.say() delivers a
         fallback line to the user.
         """
         for pattern, handler in self._routes:
@@ -43,7 +43,8 @@ class Router:
                 try:
                     handler(m, ctx)
                 except Exception:
-                    log.exception("Unhandled error in skill handler '%s':", handler.__name__)
+                    log.exception(
+                        "Unhandled error in skill handler '%s':", handler.__name__)
                     ctx.say("Something went wrong, sir.")
                 return True
         return False

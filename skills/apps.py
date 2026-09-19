@@ -13,7 +13,7 @@ if TYPE_CHECKING:
     from core.context import Context
     from core.router import Router
 
-log = logging.getLogger("jarvis.skills.apps")
+log = logging.getLogger("Zia.skills.apps")
 
 # ---------------------------------------------------------------------------
 # App & site registry
@@ -309,8 +309,8 @@ PATTERNS = [
     #          "hey open X", "go ahead and open X", "can you launch X", etc.
     (
         (r"^(?:(?:can you|please|hey|go ahead and)\s+)?"
-        r"(?:open(?:\s+up)?|launch|start|run)\s+"
-        r"(?:(?:the|a|an)\s+)?(?P<target>.+?)$"),
+         r"(?:open(?:\s+up)?|launch|start|run)\s+"
+         r"(?:(?:the|a|an)\s+)?(?P<target>.+?)$"),
         _handle_open,
     ),
 ]

@@ -10,7 +10,7 @@ if TYPE_CHECKING:
     from core.context import Context
     from core.router import Router
 
-log = logging.getLogger("jarvis.skills.web")
+log = logging.getLogger("Zia.skills.web")
 
 
 def _handle_google_search(match: re.Match, ctx: Context) -> None:
