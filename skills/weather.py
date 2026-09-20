@@ -25,3 +25,10 @@ def take_weather(match, ctx):
 
 def register(router):
     router.register(r"(?i)\b(?:what is the weather|weather today|how is the weather|what's the weather)\b", take_weather)
+    router.register_intent([
+        "what is the weather like right now",
+        "tell me the current weather",
+        "is it going to rain today",
+        "do I need an umbrella today",
+        "how hot is it outside"
+    ], take_weather)

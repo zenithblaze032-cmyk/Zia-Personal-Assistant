@@ -10,6 +10,8 @@ from core.context import Context
 from core.router import Router
 from core.state import AssistantState, st
 from core.tts import say_text
+from core.memory import Memory
+from core.llm import generate_chat
 import pystray
 from PIL import Image, ImageDraw
 
@@ -36,7 +38,8 @@ def _go_sleep():
         st.state = AssistantState.ASLEEP
 
 
-ctx = Context(say_fn=say_text, sleep_fn=_go_sleep, shutdown_fn=_go_shutdown)
+memory = Memory(max_turns=5)
+ctx = Context(say_fn=say_text, sleep_fn=_go_sleep, shutdown_fn=_go_shutdown, memory=memory)
 
 # Hotwords
 EXIT_PHRASES = ["exit Zia", "quit Zia", "shut down Zia", "shutdown Zia",
@@ -110,11 +113,18 @@ def _dispatch(text: str) -> None:
         st.last_activity = time.monotonic()
         return
 
+    # Add user message to memory
+    memory.add_user_message(text)
+
     matched = router.dispatch(text, ctx)
     if matched:
         st.last_activity = time.monotonic()
     else:
-        ctx.say("I don't know that one yet.")
+        # LLM fallback
+        log.info("No skill matched. Falling back to LLM.")
+        response = generate_chat(memory.get_context())
+        ctx.say(response)
+        st.last_activity = time.monotonic()
 
 
 def setup_tray():
