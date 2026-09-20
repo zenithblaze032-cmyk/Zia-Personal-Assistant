@@ -102,6 +102,23 @@ def _handle_intro(match: re.Match, ctx: Context) -> None:
         "How may I be of service?"
     )
 
+def _handle_vision(match: re.Match, ctx: Context) -> None:
+    ctx.say("Let me take a look...")
+    try:
+        from core.vision import capture_screen_bytes
+        from core.llm import generate_vision_chat
+        
+        query = "Describe what is on the screen briefly."
+        if match and "query" in match.groupdict() and match.group("query"):
+            query = match.group("query").strip()
+            
+        img_bytes = capture_screen_bytes()
+        response = generate_vision_chat(query, img_bytes)
+        ctx.say(response)
+    except Exception as e:
+        log.error(f"Vision failed: {e}")
+        ctx.say("I couldn't analyze the screen, sir.")
+
 
 # ---------------------------------------------------------------------------
 # Registration
@@ -111,6 +128,7 @@ PATTERNS = [
     (r"\bwhat(?:'s| is) the date\b|\bwhat day is it\b|\bwhat(?:'s| is) today\b|\bdate\b$", _handle_date),
     (r"\bscreenshot\b|\btake a screenshot\b|\bgrab (a |the )?screenshot\b",
      _handle_screenshot),
+    (r"\b(?:what is on my screen|read my screen|analyze my screen|what am i looking at)(?:\s+(?P<query>.*))?\b", _handle_vision),
     (r"\block\b.*(pc|screen|computer|workstation)|\block it\b", _handle_lock),
     (r"\bvolume up\b|\bturn it up\b|\blouder\b|\bincrease (the )?volume\b", _handle_volume_up),
     (r"\bvolume down\b|\bturn it down\b|\bquieter\b|\bdecrease (the )?volume\b|\blower (the )?volume\b", _handle_volume_down),

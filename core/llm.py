@@ -24,6 +24,27 @@ def generate_chat(messages: List[Dict[str, str]]) -> str:
         return "I'm having trouble connecting to my brain right now, sir."
 
 
+VISION_MODEL = "moondream:latest"
+
+def generate_vision_chat(prompt: str, image_bytes: bytes) -> str:
+    """
+    Generate a response from the local Vision LLM based on an image and a prompt.
+    """
+    try:
+        response = ollama.chat(
+            model=VISION_MODEL,
+            messages=[{
+                "role": "user",
+                "content": prompt,
+                "images": [image_bytes]
+            }]
+        )
+        return response['message']['content']
+    except Exception as e:
+        log.error(f"Error communicating with local Vision LLM ({VISION_MODEL}): {e}")
+        return "I couldn't analyze the screen, sir."
+
+
 def generate_embedding(text: str) -> List[float]:
     """
     Generate an embedding vector for the given text.

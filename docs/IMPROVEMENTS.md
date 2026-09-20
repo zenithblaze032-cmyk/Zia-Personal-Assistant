@@ -29,7 +29,6 @@ _Focus on moving beyond rigid regular expressions (regex) to actual language und
 
 _Focus on giving Zia control over the physical environment and screen content._
 
-- [ ] **Smart Home Control**: Add an MQTT client or hook into Home Assistant APIs to control local IoT devices (_"Dim the room lights"_, _"Turn on the fan"_).
 - [ ] **Window & OS Management**: Deepen OS integration to arrange the screen dynamically. (_"Snap VS Code to the left and Chrome to the right"_).
 - [ ] **Screen Context Awareness (Vision LLM)**: Integrate a local vision model (like LLaVA). When asked _"Why is this code throwing an error?"_, Zia takes a background screenshot, analyzes the active window, and speaks the solution.
 
