@@ -283,7 +283,16 @@ class ZiaTTS:
         pcm_f32 = np.concatenate([pad, pcm_f32, pad])
 
         sd.play(pcm_f32, samplerate=sample_rate)
-        sd.wait()
+        
+        # Import interrupt_event here to avoid circular imports if any, or just at top
+        from core.config import interrupt_event
+        
+        while sd.get_stream().active:
+            if interrupt_event.is_set():
+                sd.stop()
+                log.info("Piper TTS playback interrupted by user.")
+                break
+            sd.sleep(50)
 
     # ------------------------------------------------------------------
 

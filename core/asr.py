@@ -15,7 +15,9 @@ from core.config import (
     POST_WAKE_COOLDOWN_S,
     SAMPLE_RATE,
     TRIGGER_COOLDOWN_S,
-    mute_mic,
+    tts_active,
+    interrupt_event,
+    INTERRUPT_PHRASES
 )
 from core.state import AssistantState, st
 from core.tts import say_text
@@ -130,9 +132,14 @@ def listen_loop(input_idx: int):
                     last_heard_text = text
                     log.info("[%s] Heard: %r", tag, text)
 
-                if mute_mic.is_set():
-                    speech_buffer = []
-                    is_speaking = False
+                if tts_active.is_set():
+                    if text:
+                        if any(phrase in text for phrase in INTERRUPT_PHRASES):
+                            log.info("Barge-in phrase detected! Interrupting TTS...")
+                            interrupt_event.set()
+                            # Clear buffer so it doesn't process trailing noise
+                            speech_buffer = []
+                            is_speaking = False
                     continue
 
                 if text:

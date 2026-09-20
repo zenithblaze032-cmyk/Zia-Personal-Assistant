@@ -27,7 +27,9 @@ class Context:
         """Speak text via TTS (non-blocking from the caller's perspective)."""
         if self.memory:
             self.memory.add_assistant_message(text)
-        self._say(text)
+        
+        import threading
+        threading.Thread(target=self._say, args=(text,), daemon=True).start()
 
     def sleep(self) -> None:
         """Tell Zia to go back to ASLEEP state."""
