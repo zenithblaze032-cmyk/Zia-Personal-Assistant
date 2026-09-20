@@ -30,7 +30,7 @@ A fast, completely offline personal assistant for Windows. It automates desktop 
 | **Media**      | _"Pause"_ / _"Next track"_          | Control media playback (global media keys)       |
 | **Utility**    | _"Take a screenshot"_               | Save a screenshot to Pictures/Zia                |
 | **Security**   | _"Lock my screen"_                  | Lock the PC workstation                          |
-| **Help**       | _"Help"_                            | List all capabilities                            |
+| **Help**       | _"Who are you"_ / _"What can you do"_ | Introduce itself and summarize capabilities      |
 | **Sleep**      | _"Go to sleep"_                     | Return to standby mode                           |
 | **Exit**       | _"Shut down"_                       | Exit the program with a goodbye                  |
 

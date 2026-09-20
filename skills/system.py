@@ -88,16 +88,18 @@ def _handle_mute(match: re.Match, ctx: Context) -> None:
     ctx.say("Muted.")
 
 
-def _handle_help(match: re.Match, ctx: Context) -> None:
+def _handle_intro(match: re.Match, ctx: Context) -> None:
     ctx.say(
-        "Here's what I can do, sir. "
-        "Open any app or website. "
-        "Search the web or YouTube. "
-        "Tell you the time or date. "
-        "Control your volume and media. "
-        "Take a screenshot. "
-        "Lock your screen. "
-        "And launch your coding workspace."
+        "I am Zia, and I am your personal assistant, sir. "
+        "I run entirely offline, right here on this machine. "
+        "My capabilities include opening any app or website, "
+        "searching the web or YouTube, "
+        "telling you the time and date, "
+        "controlling your volume and media, "
+        "taking screenshots, "
+        "locking your screen, "
+        "and launching your coding workspace. "
+        "How may I be of service?"
     )
 
 
@@ -113,7 +115,9 @@ PATTERNS = [
     (r"\bvolume up\b|\bturn it up\b|\blouder\b|\bincrease (the )?volume\b", _handle_volume_up),
     (r"\bvolume down\b|\bturn it down\b|\bquieter\b|\bdecrease (the )?volume\b|\blower (the )?volume\b", _handle_volume_down),
     (r"\bmute\b|\bsilence\b|\bshut up\b", _handle_mute),
-    (r"\bwhat can you do\b|\bwhat you can do\b|\blist commands\b|\bcommands\b", _handle_help),
+    (r"\bwho are you\b|\bwhat are you\b|\bwhat(?:'s| is) your name\b|\bintroduce yourself\b|"
+     r"\btell me about yourself\b|\byour capabilities\b|\bwhat can you do\b|\bwhat you can do\b|"
+     r"\blist commands\b|\bcommands\b|\bhelp\b", _handle_intro),
 ]
 
 

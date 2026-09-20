@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Changed
+
+- Replaced the "What can you do" help listing with a professional identity intro. Phrases like _"Who are you?"_, _"What's your name?"_, or _"Introduce yourself"_ now respond with an introduction — "I am Zia, and I am your personal assistant…" — followed by a summary of capabilities. _"What can you do?"_ and _"Help"_ still route to the same intro.
+
 ## [0.2.1] - Codebase Cleanup & Restructuring
 
 ### Added
