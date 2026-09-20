@@ -162,6 +162,11 @@ def main():
     log.info("Zia is listening...")
 
     init_asr(_wake_word_hit, _strip_wake_prefix, _dispatch, _go_sleep)
+
+    # Start background proactive monitoring
+    from core.proactive import start_proactive_monitoring
+    start_proactive_monitoring(ctx)
+
     setup_tray()
 
     try:

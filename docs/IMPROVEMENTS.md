@@ -19,9 +19,9 @@ _Focus on adding skills that make daily workflows smoother without needing compl
 
 _Focus on moving beyond rigid regular expressions (regex) to actual language understanding._
 
-- [ ] **Local LLM Integration**: Integrate a local LLM (like Llama-3 via Ollama) so Zia can answer general knowledge questions, brainstorm ideas, and parse complex intents offline.
-- [ ] **Context Memory**: Implement a short-term memory buffer so Zia remembers the context of the conversation. (e.g., If you say _"Search YouTube for Python tutorials"_, and then say _"Play the second one"_, Zia understands what "the second one" refers to).
-- [ ] **Fuzzy Intent Matching**: Replace strict regex routers with lightweight NLP (like `spaCy` or local text embeddings) to classify intents naturally.
+- `[x]` **Local LLM Integration**: Integrate a local LLM (like Llama-3 via Ollama) so Zia can answer general knowledge questions, brainstorm ideas, and parse complex intents offline.
+- `[x]` **Context Memory**: Implement a short-term memory buffer so Zia remembers the context of the conversation. (e.g., If you say _"Search YouTube for Python tutorials"_, and then say _"Play the second one"_, Zia understands what "the second one" refers to).
+- `[x]` **Fuzzy Intent Matching**: Replace strict regex routers with lightweight NLP (like `spaCy` or local text embeddings) to classify intents naturally.
 
 ---
 
@@ -29,8 +29,8 @@ _Focus on moving beyond rigid regular expressions (regex) to actual language und
 
 _Focus on giving Zia control over the physical environment and screen content._
 
-- [ ] **Window & OS Management**: Deepen OS integration to arrange the screen dynamically. (_"Snap VS Code to the left and Chrome to the right"_).
-- [ ] **Screen Context Awareness (Vision LLM)**: Integrate a local vision model (like LLaVA). When asked _"Why is this code throwing an error?"_, Zia takes a background screenshot, analyzes the active window, and speaks the solution.
+- `[x]` **Window & OS Management**: Deepen OS integration to arrange the screen dynamically. (_"Snap VS Code to the left and Chrome to the right"_).
+- `[x]` **Screen Context Awareness (Vision LLM)**: Integrate a local vision model (like LLaVA). When asked _"Why is this code throwing an error?"_, Zia takes a background screenshot, analyzes the active window, and speaks the solution.
 
 ---
 

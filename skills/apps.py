@@ -205,22 +205,21 @@ def _launch_app(name: str) -> bool:
 
 def _start(target: str) -> bool:
     """
-    Use `cmd /c start "" <target>` to open anything Windows knows about.
-    This leverages the Windows App Paths registry so Spotify, Chrome, etc.
-    all work without hardcoding their install directories.
+    Simulate the Windows Start Menu search to launch unknown apps.
+    This works reliably for 3rd party apps like CapCut, Blender, etc.
     """
     try:
-        kw: dict = {
-            "stdin": subprocess.DEVNULL,
-            "stdout": subprocess.DEVNULL,
-            "stderr": subprocess.DEVNULL,
-        }
-        if sys.platform == "win32":
-            kw["creationflags"] = subprocess.CREATE_NO_WINDOW
-        subprocess.Popen(["cmd", "/c", "start", "", target], **kw)
+        import pyautogui
+        import time
+        log.info("Using Start Menu fallback for: %s", target)
+        pyautogui.press("win")
+        time.sleep(0.5)
+        pyautogui.write(target, interval=0.01)
+        time.sleep(0.5)
+        pyautogui.press("enter")
         return True
-    except OSError as e:
-        log.warning("start(%r) failed: %s", target, e)
+    except Exception as e:
+        log.warning("Start menu fallback failed for %r: %s", target, e)
         return False
 
 

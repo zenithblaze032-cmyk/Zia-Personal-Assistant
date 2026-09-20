@@ -30,6 +30,12 @@ _strip_wake_prefix = None
 _dispatch = None
 _go_sleep = None
 
+# Global state to track if user is currently talking
+_user_is_speaking = False
+
+def is_user_speaking() -> bool:
+    return _user_is_speaking
+
 
 def init_asr(wake_fn, strip_fn, dispatch_fn, sleep_fn):
     global _wake_word_hit, _strip_wake_prefix, _dispatch, _go_sleep
@@ -40,11 +46,12 @@ def init_asr(wake_fn, strip_fn, dispatch_fn, sleep_fn):
 
 
 def listen_loop(input_idx: int):
+    global _user_is_speaking
     log.info("Initializing Google Speech Recognition...")
     recognizer = sr.Recognizer()
 
     speech_buffer = []
-    is_speaking = False
+    _user_is_speaking = False
     silence_frames = 0
     ENERGY_THRESHOLD = 500
 
@@ -94,17 +101,17 @@ def listen_loop(input_idx: int):
                 tag = ""
 
                 if is_speech_frame:
-                    if not is_speaking:
-                        is_speaking = True
+                    if not _user_is_speaking:
+                        _user_is_speaking = True
                     speech_buffer.append(audio_bytes)
                     silence_frames = 0
                 else:
-                    if is_speaking:
+                    if _user_is_speaking:
                         silence_frames += 1
                         speech_buffer.append(audio_bytes)
 
                         if silence_frames > 20:
-                            is_speaking = False
+                            _user_is_speaking = False
                             audio_data_bytes = b"".join(speech_buffer)
                             speech_buffer = []
                             silence_frames = 0
@@ -139,7 +146,7 @@ def listen_loop(input_idx: int):
                             interrupt_event.set()
                             # Clear buffer so it doesn't process trailing noise
                             speech_buffer = []
-                            is_speaking = False
+                            _user_is_speaking = False
                     continue
 
                 if text:

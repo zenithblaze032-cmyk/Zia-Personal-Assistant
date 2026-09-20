@@ -139,10 +139,22 @@ def _handle_open(match: re.Match, ctx: Context) -> None:
         launch_target = known_apps.get(target.lower(), target)
         
         import os
-        os.startfile(launch_target)
-        ctx.say(f"Opening {target}.")
-    except FileNotFoundError:
-        ctx.say(f"I couldn't find {target}, sir.")
+        import time
+        import pyautogui
+        
+        if os.path.exists(launch_target) or launch_target in known_apps.values():
+            os.startfile(launch_target)
+            ctx.say(f"Opening {target}.")
+        else:
+            # The most robust way to open any installed app (like CapCut or Blender) 
+            # is to simulate the Windows Start Menu search!
+            ctx.say(f"Searching for {target}...")
+            pyautogui.press("win")
+            time.sleep(0.5)
+            pyautogui.write(target, interval=0.01)
+            time.sleep(0.5)
+            pyautogui.press("enter")
+            
     except Exception as e:
         log.error(f"Failed to open {target}: {e}")
         ctx.say(f"I couldn't open {target}, sir.")
