@@ -13,3 +13,4 @@ requests>=2.30.0
 pyperclip>=1.8.2
 ollama>=0.3.0
 pygetwindow>=0.0.9
+pyautogui>=0.9.54
