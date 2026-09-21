@@ -9,3 +9,5 @@ graphify-out/
 *.onnx
 *.onnx.json
 *.zip
+*.txt
+*.env

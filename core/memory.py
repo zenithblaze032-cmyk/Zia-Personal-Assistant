@@ -1,5 +1,7 @@
 from collections import deque
 from typing import List, Dict
+import os
+import logging
 
 class Memory:
     """
@@ -28,9 +30,22 @@ class Memory:
 
     def get_context(self) -> List[Dict[str, str]]:
         """
-        Returns the conversation history including the system prompt.
+        Returns the conversation history including the system prompt and long-term memory.
         """
-        return [self.system_prompt] + list(self.messages)
+        system_prompt_copy = self.system_prompt.copy()
+        
+        # Read long-term memory if it exists
+        memory_file = "memory.txt"
+        if os.path.exists(memory_file):
+            try:
+                with open(memory_file, "r", encoding="utf-8") as f:
+                    memory_content = f.read().strip()
+                if memory_content:
+                    system_prompt_copy["content"] += "\n\nUser Notes and Preferences (Long-Term Memory):\n" + memory_content
+            except Exception as e:
+                logging.getLogger(__name__).error(f"Failed to read memory file: {e}")
+                
+        return [system_prompt_copy] + list(self.messages)
 
     def clear(self):
         self.messages.clear()

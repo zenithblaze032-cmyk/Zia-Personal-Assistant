@@ -12,7 +12,7 @@ def take_note(match, ctx):
         return
         
     try:
-        notes_file = Path("local.txt").resolve()
+        notes_file = Path("memory.txt").resolve()
         timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         
         with open(notes_file, "a", encoding="utf-8") as f:
@@ -26,6 +26,6 @@ def take_note(match, ctx):
 
 def register(router):
     router.register(
-        pattern=r"(?i)\b(?:take a note that|remind me to|note down)\s+(?P<note>.+)",
+        pattern=r"(?i)\b(?:take a note that|remind me to|note down|remember that|remember)\s+(?P<note>.+)",
         handler=take_note
     )

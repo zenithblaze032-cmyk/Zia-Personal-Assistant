@@ -1,53 +1,48 @@
-# Zia Personal Assistant - Roadmap & Improvements
+# Zia Personal Assistant - Next Generation Roadmap
 
-This document outlines a 5-phase roadmap to evolve Zia from a basic voice-activated launcher into a highly advanced, context-aware AI assistant.
-
----
-
-## Phase 1: Expanding the Basics (Everyday Utilities) 🛠️
-
-_Focus on adding skills that make daily workflows smoother without needing complex AI._
-
-- [ ] **Weather & News Skill**: Integrate a simple API (like OpenWeatherMap) to handle queries like _"What's the weather today?"_ or _"Read me the top tech headlines."_
-- [ ] **Alarms & Timers**: Add a skill to set background timers (_"Set a timer for 15 minutes"_) or alarms, triggering audio playback when the time is up.
-- [ ] **Clipboard Manager**: A utility skill to manage the clipboard. Example: _"Zia, read my clipboard"_ or _"Save my clipboard to notes."_
-- [ ] **Custom Wake Word Training**: Transition from the Google Speech API fallback back to `openwakeword` by training a custom `hey_Zia.onnx` model so the wake word processing happens entirely locally.
+This document outlines the *next generation* of improvements for Zia, starting fresh from Phase 1. Now that the core brains and automation hands are built, we are focusing on giving Zia long-term memory, advanced agentic capabilities, a visual presence, and ecosystem connectivity.
 
 ---
 
-## Phase 2: Smarter Understanding (The Brains) 🧠
+## Phase 1: Persistent Memory & Context (The "Cheatcode") 🧠
+*Currently, Zia's memory resets when the script restarts. We need her to remember things long-term.*
 
-_Focus on moving beyond rigid regular expressions (regex) to actual language understanding._
-
-- `[x]` **Local LLM Integration**: Integrate a local LLM (like Llama-3 via Ollama) so Zia can answer general knowledge questions, brainstorm ideas, and parse complex intents offline.
-- `[x]` **Context Memory**: Implement a short-term memory buffer so Zia remembers the context of the conversation. (e.g., If you say _"Search YouTube for Python tutorials"_, and then say _"Play the second one"_, Zia understands what "the second one" refers to).
-- `[x]` **Fuzzy Intent Matching**: Replace strict regex routers with lightweight NLP (like `spaCy` or local text embeddings) to classify intents naturally.
-
----
-
-## Phase 3: Advanced Automation & Vision 👁️
-
-_Focus on giving Zia control over the physical environment and screen content._
-
-- `[x]` **Window & OS Management**: Deepen OS integration to arrange the screen dynamically. (_"Snap VS Code to the left and Chrome to the right"_).
-- `[x]` **Screen Context Awareness (Vision LLM)**: Integrate a local vision model (like LLaVA). When asked _"Why is this code throwing an error?"_, Zia takes a background screenshot, analyzes the active window, and speaks the solution.
+- [ ] **Text-File Memory System**: Create a lightweight, file-based memory system (`.txt` or JSON files) that stores user preferences, past context, and important notes.
+- [ ] **Memory Retrieval**: Before Zia answers a prompt, she scans these text files so she always remembers who you are, what projects you are working on, and how you like things done.
+- [ ] **Voice-Activated Note Taking**: Allow the user to say *"Zia, remember that my WiFi password is XYZ"* and have her automatically append it to the memory file.
 
 ---
 
-## Phase 4: Proactive Assistant & Routines ⏰
+## Phase 2: Advanced Agentic Tooling 🛠️
+*Move beyond rigid regex patterns and give the LLM the ability to actively "do" things.*
 
-_Focus on making Zia act without explicit prompts._
-
-- [ ] **Custom Routines**: Chain multiple skills together into triggers. Saying _"Good morning, Zia"_ could read the daily schedule, announce the weather, and open the development workspace.
-- [ ] **Proactive Notifications**: Allow background threads to push spoken notifications to Zia. (e.g., _"Sir, your build has finished successfully"_ or _"You have an upcoming meeting in 10 minutes"_).
-- [ ] **System Monitoring**: Background monitoring of PC resources. If temperatures or RAM usage get too high, Zia proactively warns: _"Sir, memory usage is at 98%, should I close some background tabs?"_
+- [ ] **Dynamic Function Calling**: Upgrade the LLM pipeline so the AI can decide which tools to use. If you ask a complex question, the LLM can choose to run a Python script or use the calculator tool itself.
+- [ ] **Real-Time Web Search**: Integrate an API (like SerpAPI or Google Search) so Zia can look up live information, news, or documentation rather than relying on offline training data.
+- [ ] **File System Agent**: Give the LLM the ability to read, summarize, and securely write to files on your PC based on your conversational requests.
 
 ---
 
-## Phase 5: The Ecosystem (Going Beyond the PC) 🌐
+## Phase 3: The PC Interface & Visuals 🖥️
+*Give Zia a visual presence on the PC rather than just living in the terminal.*
 
-_Focus on accessing Zia from anywhere and ensuring security._
+- [ ] **Floating Minimalist GUI**: Build a sleek, transparent overlay (using PyQt or Tkinter) that sits quietly on your screen. It can show a visual sound waveform when she is listening or speaking.
+- [ ] **Rich Visual Cards**: When you ask for the weather, a YouTube video, or a code snippet, Zia can display a beautiful, temporary visual card on the screen in addition to speaking.
+- [ ] **System Tray Controls**: Add advanced right-click menus to the existing system tray icon for quick toggles (mute, pause proactive monitoring, etc.).
 
-- [ ] **Local HTTP API**: Expose a local REST API or WebSocket server so commands can be triggered from mobile apps, iOS Shortcuts, or Stream Decks.
-- [ ] **Multi-Room Microphones**: Build cheap ESP32 satellite microphones for other rooms. Audio spoken in the kitchen is streamed to the PC, and Zia responds through a network-connected kitchen speaker.
-- [ ] **Speaker Verification (Voice ID)**: Train the wake word engine to recognize the unique voice signature of the primary user, ensuring unauthorized people cannot issue sensitive commands.
+---
+
+## Phase 4: The Mobile & Ecosystem Bridge 📱
+*Allow you to interact with Zia when you aren't sitting directly at your keyboard.*
+
+- [ ] **Headless API Server**: Spin up a lightweight FastAPI server in the background so Zia can receive commands over the local network.
+- [ ] **Companion Web App**: A local webpage accessible from your phone that acts as a "Zia Remote Control." You can silently type commands, view PC health stats, or trigger routines from your bed.
+- [ ] **Webhook Listener**: Allow external services to trigger Zia. For example, if a GitHub Action fails or a Google Calendar event approaches, the API can receive the webhook and Zia will speak the notification out loud.
+
+---
+
+## Phase 5: Cloud APIs & Advanced Integrations ☁️
+*Since we are not strictly locking this down to 100% offline, we can plug in powerful cloud services for heavy lifting.*
+
+- [ ] **Hybrid LLM Routing**: Keep the local LLaMA model for fast, everyday tasks, but add API keys for GPT-4 or Claude. Zia can route highly complex coding questions to the cloud models for maximum accuracy.
+- [ ] **Ultra-Realistic Voice (Optional)**: Integrate ElevenLabs or OpenAI TTS APIs as an alternative to Piper TTS for incredibly lifelike, emotive voice responses when connected to the internet.
+- [ ] **Smart Home Hooks**: Connect Zia's API to Home Assistant or Philips Hue so you can control your physical room lighting when you trigger your "Good morning" or "Hackathon" routines.
