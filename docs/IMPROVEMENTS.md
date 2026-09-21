@@ -7,9 +7,9 @@ This document outlines the *next generation* of improvements for Zia, starting f
 ## Phase 1: Persistent Memory & Context (The "Cheatcode") 🧠
 *Currently, Zia's memory resets when the script restarts. We need her to remember things long-term.*
 
-- [ ] **Text-File Memory System**: Create a lightweight, file-based memory system (`.txt` or JSON files) that stores user preferences, past context, and important notes.
-- [ ] **Memory Retrieval**: Before Zia answers a prompt, she scans these text files so she always remembers who you are, what projects you are working on, and how you like things done.
-- [ ] **Voice-Activated Note Taking**: Allow the user to say *"Zia, remember that my WiFi password is XYZ"* and have her automatically append it to the memory file.
+- [x] **Text-File Memory System**: Create a lightweight, file-based memory system (`.txt` or JSON files) that stores user preferences, past context, and important notes.
+- [x] **Memory Retrieval**: Before Zia answers a prompt, she scans these text files so she always remembers who you are, what projects you are working on, and how you like things done.
+- [x] **Voice-Activated Note Taking**: Allow the user to say *"Zia, remember that my WiFi password is XYZ"* and have her automatically append it to the memory file.
 
 ---
 

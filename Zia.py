@@ -2,7 +2,11 @@ import logging
 import sys
 import threading
 import time
+import warnings
 
+warnings.filterwarnings("ignore", category=DeprecationWarning)
+warnings.filterwarnings("ignore", category=ResourceWarning)
+warnings.filterwarnings("ignore", category=RuntimeWarning, module="duckduckgo_search")
 import skills as _skills_pkg
 from core.asr import init_asr, listen_loop
 from core.config import *

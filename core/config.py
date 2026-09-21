@@ -50,7 +50,7 @@ WAKE_WORD_ALIASES: tuple[str, ...] = tuple(
 )
 WAKE_WORD_FUZZY_THRESHOLD = _env_float("WAKE_WORD_FUZZY_THRESHOLD", 0.78)
 TRIGGER_COOLDOWN_S = 5.0
-IDLE_TIMEOUT_S = _env_float("IDLE_TIMEOUT_S", 30.0)
+IDLE_TIMEOUT_S = _env_float("IDLE_TIMEOUT_S", 90.0)
 POST_WAKE_COOLDOWN_S = _env_float("POST_WAKE_COOLDOWN_S", 3.0)
 CLAP_THRESHOLD = 3000
 
@@ -65,7 +65,10 @@ INTERRUPT_PHRASES = [
     "stop talking", 
     "shut up", 
     "quiet zia",
-    "enough zia"
+    "enough zia",
+    "stop listening",
+    "go to sleep",
+    "sleep zia"
 ]
 
 # ---------------------------------------------------------------------------

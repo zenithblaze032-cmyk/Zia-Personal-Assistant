@@ -130,9 +130,9 @@ def listen_loop(input_idx: int):
 
                 if not text:
                     now = time.monotonic()
-                    if (now - last_voice_time) > 20.0 and (now - last_silence_warn) > 20.0:
+                    if (now - last_voice_time) > 90.0 and (now - last_silence_warn) > 90.0:
                         last_silence_warn = now
-                        log.warning("No speech heard for 20s.")
+                        log.warning("No speech heard for 90s.")
                     continue
 
                 if text != last_heard_text:
@@ -144,6 +144,8 @@ def listen_loop(input_idx: int):
                         if any(phrase in text for phrase in INTERRUPT_PHRASES):
                             log.info("Barge-in phrase detected! Interrupting TTS...")
                             interrupt_event.set()
+                            if "sleep" in text:
+                                _go_sleep()
                             # Clear buffer so it doesn't process trailing noise
                             speech_buffer = []
                             _user_is_speaking = False
