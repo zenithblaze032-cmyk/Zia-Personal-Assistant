@@ -51,7 +51,7 @@ ctx = Context(say_fn=say_text, sleep_fn=_go_sleep, shutdown_fn=_go_shutdown, mem
 
 # Hotwords
 EXIT_PHRASES = ["exit Zia", "quit Zia", "shut down Zia", "shutdown Zia",
-                "close Zia", "exit", "quit", "shut down", "shutdown", "close"]
+                "close Zia", "shut down", "shutdown"]
 SLEEP_PHRASES = ["go to sleep", "sleep Zia", "Zia sleep", "standby", "sleep"]
 
 

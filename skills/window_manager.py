@@ -81,6 +81,19 @@ def _handle_maximize(match: re.Match, ctx: Context) -> None:
     else:
         ctx.say(f"I couldn't find a window for {app_name}, sir.")
 
+def _handle_close(match: re.Match, ctx: Context) -> None:
+    app_name = match.group("app").strip()
+    win = _find_window(app_name)
+    if win:
+        try:
+            win.close()
+            ctx.say(f"Closed {app_name}.")
+        except Exception as e:
+            log.error(f"Failed to close window: {e}")
+            ctx.say(f"I couldn't close {app_name}, sir.")
+    else:
+        ctx.say(f"I couldn't find a window for {app_name}, sir.")
+
 # ---------------------------------------------------------------------------
 # Registration
 # ---------------------------------------------------------------------------
@@ -88,6 +101,7 @@ PATTERNS = [
     (r"\bsnap\s+(?P<app>.+?)\s+to (?:the )?left\b", _handle_snap_left),
     (r"\bsnap\s+(?P<app>.+?)\s+to (?:the )?right\b", _handle_snap_right),
     (r"\bmaximize\s+(?P<app>.+?)\b", _handle_maximize),
+    (r"\b(?:close|quit|exit)\s+(?P<app>.+?)\b", _handle_close),
 ]
 
 def register(router: Router) -> None:

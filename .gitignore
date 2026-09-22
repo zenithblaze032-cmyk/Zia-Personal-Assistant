@@ -9,6 +9,7 @@ graphify-out/
 *.onnx
 *.onnx.json
 *.zip
+docs/IMPROVEMENTS.md
 
 # --- Memory data (never commit personal memory stores) ---
 memory.txt
