@@ -64,6 +64,7 @@ class ASRPipeline:
         recognizer = sr.Recognizer()
         return recognizer.recognize_google(audio_obj).lower().strip()
 
+
     def _check_barge_in(self, audio_data_bytes: bytes):
         if not tts_active.is_set():
             return

@@ -7,11 +7,7 @@ echo  ============================================================
 echo    J A R V I S  -  Voice-Activated Workspace Launcher
 echo  ============================================================
 echo.
-echo  Say "Zia" to launch your workspace:
-echo.
-echo    [LEFT]   LeetCode
-echo    [CENTRE] YouTube Playlist
-echo    [RIGHT]  VS Code + Terminal
+echo  Say "wake up" to launch your assistant:
 echo.
 echo  Press Ctrl+C or say "shut down Zia" to exit.
 echo  ============================================================

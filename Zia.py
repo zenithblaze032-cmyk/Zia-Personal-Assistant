@@ -35,7 +35,8 @@ _skills_pkg.register_all(router)
 def _go_shutdown():
     log.info("Exit command received. Shutting down.")
     say_text(Zia_EXIT_PHRASE)
-    sys.exit(0)
+    import os
+    os._exit(0)
 
 
 def _go_sleep():
@@ -102,7 +103,7 @@ def _dispatch(text: str) -> None:
             ctx.say(response)
         else:
             if getattr(ctx, 'executor', None):
-                response = ctx.executor.execute(text)
+                response = ctx.executor.execute(text, ctx_memory=memory)
                 ctx.say(response)
             else:
                 log.info("Executor not initialized (Phase 3 pending). Falling back to basic LLM.")
