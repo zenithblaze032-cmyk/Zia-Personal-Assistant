@@ -1,6 +1,6 @@
 # Zia 🎙️
 
-A fast, completely offline personal assistant for Windows. It automates desktop tasks through simple voice commands — no cloud, no API keys, no subscriptions.
+A fast, hybrid (online/offline) personal assistant for Windows. It automates desktop tasks through simple voice commands — using Google Speech API for recognition while retaining offline capabilities for local actions.
 
 ## How it Works
 

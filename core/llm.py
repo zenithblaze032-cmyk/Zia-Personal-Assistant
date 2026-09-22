@@ -16,7 +16,14 @@ def generate_chat(messages: List[Dict[str, Any]]) -> str:
     Supports tool calling.
     """
     try:
+        import datetime
+        now = datetime.datetime.now()
+        system_prompt = f"You are Zia, an AI assistant. The current date and time is {now.strftime('%Y-%m-%d %H:%M:%S')}."
+        
         current_messages = list(messages)
+        if not any(m.get('role') == 'system' for m in current_messages):
+            current_messages.insert(0, {"role": "system", "content": system_prompt})
+
         
         # Build tool schemas for Ollama
         ollama_tools = []
@@ -28,7 +35,14 @@ def generate_chat(messages: List[Dict[str, Any]]) -> str:
             properties = {}
             required = []
             for name, param in sig.parameters.items():
-                param_type = "string"  # Simplified, assume all are strings for these simple tools
+                param_type = "string"
+                if param.annotation != inspect.Parameter.empty:
+                    if param.annotation == int:
+                        param_type = "integer"
+                    elif param.annotation == bool:
+                        param_type = "boolean"
+                    elif param.annotation == float:
+                        param_type = "number"
                 properties[name] = {"type": param_type, "description": f"Parameter {name}"}
                 if param.default == inspect.Parameter.empty:
                     required.append(name)

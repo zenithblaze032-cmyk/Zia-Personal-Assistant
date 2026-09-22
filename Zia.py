@@ -8,7 +8,7 @@ warnings.filterwarnings("ignore", category=DeprecationWarning)
 warnings.filterwarnings("ignore", category=ResourceWarning)
 warnings.filterwarnings("ignore", category=RuntimeWarning, module="duckduckgo_search")
 import skills as _skills_pkg
-from core.asr import init_asr, listen_loop
+from core.asr import ASRPipeline
 from core.config import *
 from core.context import Context
 from core.router import Router
@@ -49,9 +49,6 @@ ctx = Context(say_fn=say_text, sleep_fn=_go_sleep, shutdown_fn=_go_shutdown, mem
 EXIT_PHRASES = ["exit Zia", "quit Zia", "shut down Zia", "shutdown Zia",
                 "close Zia", "exit", "quit", "shut down", "shutdown", "close"]
 SLEEP_PHRASES = ["go to sleep", "sleep Zia", "Zia sleep", "standby", "sleep"]
-DSA_WORK_PHRASES = ["get back to dsa work"]
-DEV_WORK_PHRASES = ["get back to development work"]
-Zia_WORK_PHRASES = ["get back to improve you"]
 
 
 def _wake_word_hit(text: str) -> bool:
@@ -82,39 +79,6 @@ def _dispatch(text: str) -> None:
         return
     if any(cmd in text for cmd in SLEEP_PHRASES):
         _go_sleep()
-        return
-    if any(cmd in text for cmd in DSA_WORK_PHRASES):
-        from core.workspace import run_workspace_launch
-        if not getattr(st, 'dsa_workspace_launched', False):
-            st.dsa_workspace_launched = True
-            log.info("Launching DSA workspace on command.")
-            threading.Thread(target=run_workspace_launch, kwargs={
-                             "mode": "dsa"}, daemon=True).start()
-        else:
-            ctx.say("The DSA workspace is already open, sir.")
-        st.last_activity = time.monotonic()
-        return
-    if any(cmd in text for cmd in DEV_WORK_PHRASES):
-        from core.workspace import run_workspace_launch
-        if not getattr(st, 'dev_workspace_launched', False):
-            st.dev_workspace_launched = True
-            log.info("Launching Dev workspace on command.")
-            threading.Thread(target=run_workspace_launch, kwargs={
-                             "mode": "dev"}, daemon=True).start()
-        else:
-            ctx.say("The Dev workspace is already open, sir.")
-        st.last_activity = time.monotonic()
-        return
-    if any(cmd in text for cmd in Zia_WORK_PHRASES):
-        from core.workspace import run_workspace_launch
-        if not getattr(st, 'zia_workspace_launched', False):
-            st.zia_workspace_launched = True
-            log.info("Launching Zia workspace on command.")
-            threading.Thread(target=run_workspace_launch, kwargs={
-                             "mode": "Zia"}, daemon=True).start()
-        else:
-            ctx.say("The Zia workspace is already open, sir.")
-        st.last_activity = time.monotonic()
         return
 
     # Add user message to memory
@@ -165,16 +129,16 @@ def main():
 
     log.info("Zia is listening...")
 
-    init_asr(_wake_word_hit, _strip_wake_prefix, _dispatch, _go_sleep)
+    asr = ASRPipeline(_wake_word_hit, _strip_wake_prefix, _dispatch, _go_sleep)
 
     # Start background proactive monitoring
     from core.proactive import start_proactive_monitoring
-    start_proactive_monitoring(ctx)
+    start_proactive_monitoring(ctx, asr)
 
     setup_tray()
 
     try:
-        listen_loop(input_idx)
+        asr.listen_loop(input_idx)
     except KeyboardInterrupt:
         log.info("Interrupted.")
         _go_shutdown()
