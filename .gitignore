@@ -9,7 +9,18 @@ graphify-out/
 *.onnx
 *.onnx.json
 *.zip
+
+# --- Memory data (never commit personal memory stores) ---
 memory.txt
+memory.db
+memory.db-journal
+memory.db-wal
+memory.db-shm
+*.db
+*.sqlite
+*.sqlite3
+
 *.env
 *.memory.db
 *.txt
+.pytest_cache/
