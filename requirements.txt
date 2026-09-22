@@ -16,3 +16,6 @@ pygetwindow>=0.0.9
 pyautogui>=0.9.54
 psutil>=5.9.0
 duckduckgo-search
+agent-sdk-core
+effgen
+agentnova

@@ -105,3 +105,14 @@ Zia_SPEAK_DELAY_S = _env_float("Zia_SPEAK_DELAY_S", 1.0)
 Zia_TTS_VOICE = (os.environ.get("Zia_TTS_VOICE") or "en-GB-RyanNeural").strip()
 Zia_PIPER_VOICE = (os.environ.get("Zia_PIPER_VOICE")
                    or "en_GB-alan-medium").strip()
+
+# ---------------------------------------------------------------------------
+# Framework Integration Flags
+# ---------------------------------------------------------------------------
+USE_EFFGEN = (os.environ.get("USE_EFFGEN") or "True").strip().lower() in ("true", "1", "yes")
+USE_AGENTNOVA = (os.environ.get("USE_AGENTNOVA") or "True").strip().lower() in ("true", "1", "yes")
+# Disabled by default since OllamaClient does not support STT
+USE_AGENTSDK_STT = (os.environ.get("USE_AGENTSDK_STT") or "False").strip().lower() in ("true", "1", "yes")
+AGENTNOVA_CONFIRM_DANGEROUS = (os.environ.get("AGENTNOVA_CONFIRM_DANGEROUS") or "True").strip().lower() in ("true", "1", "yes")
+AGENTNOVA_TIMEOUT_SEC = int(_env_float("AGENTNOVA_TIMEOUT_SEC", 30))
+EFFGEN_COMPRESS_PROMPTS = (os.environ.get("EFFGEN_COMPRESS_PROMPTS") or "True").strip().lower() in ("true", "1", "yes")

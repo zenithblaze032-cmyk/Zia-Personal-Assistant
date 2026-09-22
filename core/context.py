@@ -17,11 +17,15 @@ class Context:
         sleep_fn: Callable[[], None],
         shutdown_fn: Callable[[], None],
         memory=None,
+        brain=None,
+        executor=None,
     ) -> None:
         self._say = say_fn
         self._sleep = sleep_fn
         self._shutdown = shutdown_fn
         self.memory = memory
+        self.brain = brain
+        self.executor = executor
 
     def say(self, text: str) -> None:
         """Speak text via TTS (non-blocking from the caller's perspective)."""

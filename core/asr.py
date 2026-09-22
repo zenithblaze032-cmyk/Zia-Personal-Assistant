@@ -17,7 +17,8 @@ from core.config import (
     TRIGGER_COOLDOWN_S,
     tts_active,
     interrupt_event,
-    INTERRUPT_PHRASES
+    INTERRUPT_PHRASES,
+    USE_AGENTSDK_STT
 )
 from core.state import AssistantState, st
 from core.tts import say_text
@@ -36,13 +37,38 @@ class ASRPipeline:
     def is_user_speaking(self) -> bool:
         return self.user_is_speaking
 
+    def _recognize_audio(self, audio_data_bytes: bytes) -> str:
+        if USE_AGENTSDK_STT:
+            import tempfile
+            import wave
+            import os
+            try:
+                from agent_sdk import OllamaClient
+                with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as f:
+                    tmp_path = f.name
+                with wave.open(tmp_path, "wb") as wf:
+                    wf.setnchannels(1)
+                    wf.setsampwidth(2)
+                    wf.setframerate(SAMPLE_RATE)
+                    wf.writeframes(audio_data_bytes)
+                
+                client = OllamaClient()
+                text = client.speech_to_text(tmp_path)
+                os.remove(tmp_path)
+                if text:
+                    return text.lower().strip()
+            except Exception as e:
+                log.warning("agent-sdk-core STT failed (%s), falling back to Google API", e)
+        
+        audio_obj = sr.AudioData(audio_data_bytes, SAMPLE_RATE, 2)
+        recognizer = sr.Recognizer()
+        return recognizer.recognize_google(audio_obj).lower().strip()
+
     def _check_barge_in(self, audio_data_bytes: bytes):
         if not tts_active.is_set():
             return
-        audio_obj = sr.AudioData(audio_data_bytes, SAMPLE_RATE, 2)
         try:
-            recognizer = sr.Recognizer()
-            text = recognizer.recognize_google(audio_obj).lower().strip()
+            text = self._recognize_audio(audio_data_bytes)
             if any(phrase in text for phrase in INTERRUPT_PHRASES):
                 log.info("Barge-in phrase detected! Interrupting TTS...")
                 interrupt_event.set()
@@ -130,16 +156,15 @@ class ASRPipeline:
                                 silence_frames = 0
 
                                 if len(audio_data_bytes) > 16000:
-                                    audio_obj = sr.AudioData(
-                                        audio_data_bytes, SAMPLE_RATE, 2)
                                     try:
-                                        text = recognizer.recognize_google(
-                                            audio_obj).lower().strip()
+                                        text = self._recognize_audio(audio_data_bytes)
                                         tag = "Final"
                                     except sr.UnknownValueError:
                                         pass
                                     except sr.RequestError as e:
                                         log.error("Google API error: %s", e)
+                                    except Exception as e:
+                                        log.error("STT error: %s", e)
 
                     if not text:
                         now = time.monotonic()

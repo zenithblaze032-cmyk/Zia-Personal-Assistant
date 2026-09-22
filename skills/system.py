@@ -126,7 +126,7 @@ def _handle_vision(match: re.Match, ctx: Context) -> None:
 PATTERNS = [
     (r"\bwhat(?:'s| is) the time\b|\bwhat time is it\b|\bthe time\b|^time$", _handle_time),
     (r"\bwhat(?:'s| is) the date\b|\bwhat day is it\b|\bwhat(?:'s| is) today\b|\bdate\b$", _handle_date),
-    (r"\bscreenshot\b|\btake a screenshot\b|\bgrab (a |the )?screenshot\b",
+    (r"\btake a screenshot\b|\bgrab (a |the )?screenshot\b",
      _handle_screenshot),
     (r"\b(?:what is on my screen|read my screen|analyze my screen|what am i looking at)(?:\s+(?P<query>.*))?\b", _handle_vision),
     (r"\block\b.*(pc|screen|computer|workstation)|\block it\b", _handle_lock),

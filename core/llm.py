@@ -9,11 +9,11 @@ CHAT_MODEL = "llama3.2:3b"
 EMBEDDING_MODEL = "nomic-embed-text:latest"
 
 
-def generate_chat(messages: List[Dict[str, Any]]) -> str:
+def generate_chat(messages: List[Dict[str, Any]], use_tools: bool = True) -> str:
     """
     Generate a response from the local LLM using the provided message history.
     Messages should be a list of dicts with 'role' and 'content'.
-    Supports tool calling.
+    Supports tool calling if use_tools is True.
     """
     try:
         import datetime
@@ -27,7 +27,8 @@ def generate_chat(messages: List[Dict[str, Any]]) -> str:
         
         # Build tool schemas for Ollama
         ollama_tools = []
-        for func in available_tools:
+        if use_tools:
+            for func in available_tools:
             import inspect
             sig = inspect.signature(func)
             doc = inspect.getdoc(func) or ""
@@ -61,11 +62,14 @@ def generate_chat(messages: List[Dict[str, Any]]) -> str:
             })
             
         while True:
-            response = ollama.chat(
-                model=CHAT_MODEL,
-                messages=current_messages,
-                tools=ollama_tools
-            )
+            chat_kwargs = {
+                "model": CHAT_MODEL,
+                "messages": current_messages
+            }
+            if use_tools and ollama_tools:
+                chat_kwargs["tools"] = ollama_tools
+                
+            response = ollama.chat(**chat_kwargs)
             
             message = response['message']
             current_messages.append(message)

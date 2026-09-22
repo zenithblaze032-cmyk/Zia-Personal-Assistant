@@ -16,6 +16,8 @@ from core.state import AssistantState, st
 from core.tts import say_text
 from core.memory import Memory
 from core.llm import generate_chat
+from core.brain import Brain, CommandComplexity
+from core.executor import AgentNovaExecutor
 import pystray
 from PIL import Image, ImageDraw
 
@@ -43,7 +45,9 @@ def _go_sleep():
 
 
 memory = Memory(max_turns=5)
-ctx = Context(say_fn=say_text, sleep_fn=_go_sleep, shutdown_fn=_go_shutdown, memory=memory)
+brain = Brain()
+executor = AgentNovaExecutor()
+ctx = Context(say_fn=say_text, sleep_fn=_go_sleep, shutdown_fn=_go_shutdown, memory=memory, brain=brain, executor=executor)
 
 # Hotwords
 EXIT_PHRASES = ["exit Zia", "quit Zia", "shut down Zia", "shutdown Zia",
@@ -88,10 +92,23 @@ def _dispatch(text: str) -> None:
     if matched:
         st.last_activity = time.monotonic()
     else:
-        # LLM fallback
-        log.info("No skill matched. Falling back to LLM.")
-        response = generate_chat(memory.get_context())
-        ctx.say(response)
+        log.info("No skill matched. Routing via Brain.")
+        category = brain.route_complexity(text)
+        log.info(f"Brain classified intent as: {category}")
+        
+        if category == CommandComplexity.SIMPLE:
+            compressed = brain.compress_prompt(text)
+            response = generate_chat(memory.get_context(current_query=compressed), use_tools=False)
+            ctx.say(response)
+        else:
+            if getattr(ctx, 'executor', None):
+                response = ctx.executor.execute(text)
+                ctx.say(response)
+            else:
+                log.info("Executor not initialized (Phase 3 pending). Falling back to basic LLM.")
+                response = generate_chat(memory.get_context(current_query=text))
+                ctx.say(response)
+        
         st.last_activity = time.monotonic()
 
 

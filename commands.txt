@@ -1,0 +1,23 @@
+# Zia Manual Test Commands
+
+Read these out loud to test the newly installed STT pipeline from agent-sdk-core (Phase 1), as well as upcoming features in later phases.
+
+## Phase 1: Environment & STT Foundation Testing
+*Test if the new agent-sdk-core speech-to-text pipeline is working.*
+
+- "Zia, what's the time?"
+- "Zia, open chrome"
+- "Zia, who are you?"
+
+## Phase 2: Memory & Brain Routing Testing (Upcoming)
+*Tests if EffGen correctly routes SIMPLE commands vs TOOL commands.*
+
+- "Zia, what's the weather?" (Should trigger EffGen SIMPLE -> LLM)
+- "Zia, remember that my favorite color is blue." (Tests agent-sdk-core RAG memory injection)
+- "Zia, what is my favorite color?" (Tests memory retrieval)
+
+## Phase 3 & 4: Execution & Safety Testing (Upcoming)
+*Tests if AgentNova executes shell tools and warns on dangerous commands.*
+
+- "Zia, find my latest screenshot and describe it." (EffGen MULTI_STEP -> AgentNova file ops + moondream)
+- "Zia, delete all files in my Downloads folder." (AgentNova TOOL -> Should trigger a safety confirmation warning!)

@@ -12,13 +12,8 @@ def take_note(match, ctx):
         return
         
     try:
-        notes_file = Path(__file__).resolve().parent.parent / "memory.txt"
-        timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        
-        with open(notes_file, "a", encoding="utf-8") as f:
-            f.write(f"[{timestamp}] {note}\n")
-            
-        log.info(f"Note saved to {notes_file}")
+        if ctx.memory:
+            ctx.memory.add_long_term_memory(note)
         ctx.say("Note saved.")
     except Exception as e:
         log.error(f"Failed to save note: {e}")
