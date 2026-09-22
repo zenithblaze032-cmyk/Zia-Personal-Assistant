@@ -84,3 +84,31 @@ class Memory:
 
     def clear(self):
         self.messages.clear()
+
+def consolidate_memory(memory_obj):
+    """
+    Background agent that summarizes recent conversation and injects facts into Long-Term RAG Memory.
+    """
+    if not memory_obj.messages:
+        return
+        
+    import threading
+    from core.llm import generate_chat
+    
+    def _run():
+        transcript = "\n".join([f"{m['role']}: {m['content']}" for m in memory_obj.messages])
+        prompt = (
+            "Extract the key preferences, facts, or habits from the user in this short conversation transcript. "
+            "Output ONLY the extracted facts, one per line. If there are no important facts to remember, output exactly 'NONE'.\n\n"
+            f"Transcript:\n{transcript}"
+        )
+        try:
+            result = generate_chat([{"role": "user", "content": prompt}], use_tools=False)
+            if result and "NONE" not in result.upper():
+                for line in result.split("\n"):
+                    if line.strip():
+                        memory_obj.add_long_term_memory(line.strip())
+        except Exception as e:
+            logging.error(f"Background memory consolidation failed: {e}")
+            
+    threading.Thread(target=_run, daemon=True).start()

@@ -11,17 +11,66 @@ class AgentNovaExecutor:
         if USE_AGENTNOVA:
             try:
                 import agentkthx
+                from agentkthx import Tool, ToolParam, make_builtin_registry
+                from core.tools import fetch_webpage, take_screenshot, minimize_window, maximize_window, press_keys
+                
+                fetch_webpage_tool = Tool(
+                    name="fetch_webpage",
+                    description="Fetches a webpage and extracts the raw readable text from the HTML.",
+                    params=[ToolParam(name="url", type="string", description="The full URL to fetch")],
+                    handler=fetch_webpage
+                )
+                take_screenshot_tool = Tool(
+                    name="take_screenshot",
+                    description="Takes a screenshot of the user's primary monitor and saves it to a temporary file.",
+                    params=[],
+                    handler=take_screenshot
+                )
+                minimize_window_tool = Tool(
+                    name="minimize_window",
+                    description="Minimizes a window by its title to hide it.",
+                    params=[ToolParam(name="window_title", type="string", description="A substring of the window title to minimize")],
+                    handler=minimize_window
+                )
+                maximize_window_tool = Tool(
+                    name="maximize_window",
+                    description="Maximizes or focuses a window by its title.",
+                    params=[ToolParam(name="window_title", type="string", description="A substring of the window title to maximize")],
+                    handler=maximize_window
+                )
+                press_keys_tool = Tool(
+                    name="press_keys",
+                    description="Presses a sequence of keyboard keys. Use for volume (volumemute, volumeup, volumedown), media (playpause), or shortcuts.",
+                    params=[ToolParam(name="keys", type="string", description="Comma-separated list of keys to press")],
+                    handler=press_keys
+                )
+                
+                # Combine builtin tools and custom tools into a ToolRegistry
+                registry = make_builtin_registry().subset(["shell", "read_file", "write_file", "list_directory", "web-search"])
+                if hasattr(registry, "register_tool"):
+                    registry.register_tool(fetch_webpage_tool)
+                    registry.register_tool(take_screenshot_tool)
+                    registry.register_tool(minimize_window_tool)
+                    registry.register_tool(maximize_window_tool)
+                    registry.register_tool(press_keys_tool)
+                else:
+                    registry.register(fetch_webpage_tool)
+                    registry.register(take_screenshot_tool)
+                    registry.register(minimize_window_tool)
+                    registry.register(maximize_window_tool)
+                    registry.register(press_keys_tool)
+                
                 # Initializing agent with shell and standard tools
                 self.agent = agentkthx.Agent(
                     model="llama3.2:3b",
-                    tools=["shell", "read_file", "write_file", "list_directory", "web-search"],
+                    tools=registry,
                     system_prompt=(
                         "You are Zia, an autonomous local agent on a WINDOWS machine.\n"
                         "The user's Desktop path is: \"C:\\Users\\Ayush Kumar\\Desktop\"\n"
                         "The user's Documents path is: \"C:\\Users\\Ayush Kumar\\Documents\"\n"
                         "IMPORTANT: Always wrap file paths in quotes (e.g. \"C:\\path\\to\\file\") when using the shell tool.\n"
                         "IMPORTANT: When using the `shell` tool, the argument name MUST be 'command' (not 'body').\n"
-                        "If built-in file tools return security errors, fallback to using the `shell` tool with Windows CMD/PowerShell commands (e.g. `dir`, `type`).\n"
+                        "CRITICAL: For web searches or reading articles, you MUST use the `web-search` and `fetch_webpage` tools. NEVER use the `shell` tool to browse the internet.\n"
                         "CRITICAL: When using a tool, you MUST output ONLY the exact tool call format required. Do NOT include any conversational text like 'I will now run...' before the tool call."
                     )
                 )

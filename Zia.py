@@ -43,6 +43,11 @@ def _go_sleep():
     if st.state != AssistantState.ASLEEP:
         log.info("Zia going to sleep.")
         st.state = AssistantState.ASLEEP
+        try:
+            from core.memory import consolidate_memory
+            consolidate_memory(memory)
+        except Exception as e:
+            log.error(f"Failed to trigger memory consolidation: {e}")
 
 
 memory = Memory(max_turns=5)
