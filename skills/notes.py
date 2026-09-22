@@ -12,7 +12,7 @@ def take_note(match, ctx):
         return
         
     try:
-        notes_file = Path("memory.txt").resolve()
+        notes_file = Path(__file__).resolve().parent.parent / "memory.txt"
         timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         
         with open(notes_file, "a", encoding="utf-8") as f:

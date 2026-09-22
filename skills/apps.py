@@ -200,7 +200,14 @@ def _launch_app(name: str) -> bool:
         except OSError as e:
             log.warning("os.startfile(%r) failed: %s", name, e)
             return False
-    return _start(name)
+            
+    # Try using subprocess directly for known executable names
+    try:
+        subprocess.Popen(f"start \"\" \"{name}\"", shell=True)
+        return True
+    except Exception as e:
+        log.warning("subprocess launch failed for %r: %s", name, e)
+        return _start(name)
 
 
 def _start(target: str) -> bool:

@@ -18,11 +18,39 @@ def generate_chat(messages: List[Dict[str, Any]]) -> str:
     try:
         current_messages = list(messages)
         
+        # Build tool schemas for Ollama
+        ollama_tools = []
+        for func in available_tools:
+            import inspect
+            sig = inspect.signature(func)
+            doc = inspect.getdoc(func) or ""
+            
+            properties = {}
+            required = []
+            for name, param in sig.parameters.items():
+                param_type = "string"  # Simplified, assume all are strings for these simple tools
+                properties[name] = {"type": param_type, "description": f"Parameter {name}"}
+                if param.default == inspect.Parameter.empty:
+                    required.append(name)
+                    
+            ollama_tools.append({
+                "type": "function",
+                "function": {
+                    "name": func.__name__,
+                    "description": doc,
+                    "parameters": {
+                        "type": "object",
+                        "properties": properties,
+                        "required": required
+                    }
+                }
+            })
+            
         while True:
             response = ollama.chat(
                 model=CHAT_MODEL,
                 messages=current_messages,
-                tools=available_tools
+                tools=ollama_tools
             )
             
             message = response['message']

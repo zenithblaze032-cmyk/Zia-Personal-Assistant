@@ -22,7 +22,7 @@ def save_clipboard(match, ctx):
     try:
         text = pyperclip.paste()
         if text:
-            notes_file = Path("local.txt").resolve()
+            notes_file = Path(__file__).resolve().parent.parent / "local.txt"
             timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             with open(notes_file, "a", encoding="utf-8") as f:
                 f.write(f"[{timestamp}] Clipboard: {text}\n")

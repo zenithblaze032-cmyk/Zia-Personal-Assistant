@@ -124,7 +124,7 @@ def _handle_vision(match: re.Match, ctx: Context) -> None:
 # Registration
 # ---------------------------------------------------------------------------
 PATTERNS = [
-    (r"\bwhat(?:'s| is) the time\b|\bwhat time is it\b|\bthe time\b|\btime\b$", _handle_time),
+    (r"\bwhat(?:'s| is) the time\b|\bwhat time is it\b|\bthe time\b|^time$", _handle_time),
     (r"\bwhat(?:'s| is) the date\b|\bwhat day is it\b|\bwhat(?:'s| is) today\b|\bdate\b$", _handle_date),
     (r"\bscreenshot\b|\btake a screenshot\b|\bgrab (a |the )?screenshot\b",
      _handle_screenshot),

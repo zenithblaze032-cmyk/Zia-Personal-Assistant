@@ -85,35 +85,35 @@ def _dispatch(text: str) -> None:
         return
     if any(cmd in text for cmd in DSA_WORK_PHRASES):
         from core.workspace import run_workspace_launch
-        if not getattr(st, 'workspace_launched', False):
-            st.workspace_launched = True
+        if not getattr(st, 'dsa_workspace_launched', False):
+            st.dsa_workspace_launched = True
             log.info("Launching DSA workspace on command.")
             threading.Thread(target=run_workspace_launch, kwargs={
                              "mode": "dsa"}, daemon=True).start()
         else:
-            ctx.say("The workspace is already open, sir.")
+            ctx.say("The DSA workspace is already open, sir.")
         st.last_activity = time.monotonic()
         return
     if any(cmd in text for cmd in DEV_WORK_PHRASES):
         from core.workspace import run_workspace_launch
-        if not getattr(st, 'workspace_launched', False):
-            st.workspace_launched = True
+        if not getattr(st, 'dev_workspace_launched', False):
+            st.dev_workspace_launched = True
             log.info("Launching Dev workspace on command.")
             threading.Thread(target=run_workspace_launch, kwargs={
                              "mode": "dev"}, daemon=True).start()
         else:
-            ctx.say("The workspace is already open, sir.")
+            ctx.say("The Dev workspace is already open, sir.")
         st.last_activity = time.monotonic()
         return
     if any(cmd in text for cmd in Zia_WORK_PHRASES):
         from core.workspace import run_workspace_launch
-        if not getattr(st, 'workspace_launched', False):
-            st.workspace_launched = True
+        if not getattr(st, 'zia_workspace_launched', False):
+            st.zia_workspace_launched = True
             log.info("Launching Zia workspace on command.")
             threading.Thread(target=run_workspace_launch, kwargs={
                              "mode": "Zia"}, daemon=True).start()
         else:
-            ctx.say("The workspace is already open, sir.")
+            ctx.say("The Zia workspace is already open, sir.")
         st.last_activity = time.monotonic()
         return
 
