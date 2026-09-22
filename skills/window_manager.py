@@ -85,8 +85,8 @@ def _handle_maximize(match: re.Match, ctx: Context) -> None:
 # Registration
 # ---------------------------------------------------------------------------
 PATTERNS = [
-    (r"\bsnap\s+(?P<app>.+?)\s+to the left\b", _handle_snap_left),
-    (r"\bsnap\s+(?P<app>.+?)\s+to the right\b", _handle_snap_right),
+    (r"\bsnap\s+(?P<app>.+?)\s+to (?:the )?left\b", _handle_snap_left),
+    (r"\bsnap\s+(?P<app>.+?)\s+to (?:the )?right\b", _handle_snap_right),
     (r"\bmaximize\s+(?P<app>.+?)\b", _handle_maximize),
 ]
 

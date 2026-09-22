@@ -128,7 +128,7 @@ def _handle_press_key(match: re.Match, ctx: Context) -> None:
 # Registration
 # ---------------------------------------------------------------------------
 PATTERNS = [
-    (r"\bmove mouse (?P<dir>up|down|left|right)(?: by (?P<amount>\d+))?\b", _handle_move_mouse),
+    (r"\b(?:move )?mouse (?P<dir>up|down|left|right)(?: by (?P<amount>\d+))?\b", _handle_move_mouse),
     (r"\b(?P<type>right click|double click|click)\b", _handle_click),
     (r"\b(?:generate and type|draft and type|write a(?:n)? (?P<doc>email|file|letter|paragraph|essay|story|script|code|message|poem) about|write about)\s+(?P<topic>.+)\b", _handle_generate_and_type),
     (r"\b(?:type|write)\s+(?P<text>.+)\b", _handle_type),

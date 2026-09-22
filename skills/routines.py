@@ -89,10 +89,10 @@ def _handle_hackathon_work(match: re.Match, ctx: Context) -> None:
 # Registration
 # ---------------------------------------------------------------------------
 PATTERNS = [
-    (r"\b(?:start|open)\s+(?:dsa|data structures?).*\b", _handle_dsa_work),
-    (r"\b(?:start|open)\s+(?:development|web dev).*\b", _handle_dev_work),
-    (r"\b(?:start|open)\s+(?:jarvis|zia)\s+work.*\b", _handle_jarvis_work),
-    (r"\b(?:start|open)\s+hackathon.*\b", _handle_hackathon_work),
+    (r"\b(?:start|open)\s+(?:dsa|data structures?)\b.*", _handle_dsa_work),
+    (r"\b(?:start|open)\s+(?:development|web dev)\b.*", _handle_dev_work),
+    (r"\b(?:start|open)\s+(?:jarvis|zia)\s+work\b.*", _handle_jarvis_work),
+    (r"\b(?:start|open)\s+hackathon\b.*", _handle_hackathon_work),
 ]
 
 def register(router: Router) -> None:

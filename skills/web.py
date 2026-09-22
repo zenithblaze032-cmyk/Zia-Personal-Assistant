@@ -34,7 +34,7 @@ def _handle_youtube_search(match: re.Match, ctx: Context) -> None:
 # ---------------------------------------------------------------------------
 PATTERNS = [
     # Google search: "google X", "open a google search for X"
-    (r"^(?:google|open a google search for)\s+(?P<query>.+?)$", _handle_google_search),
+    (r"^(?:google|open a google search for|search google for|open google and search for)\s+(?P<query>.+?)$", _handle_google_search),
     # YouTube: "play X on youtube", "find X on youtube"
     (r"^(?:play|find)\s+(?P<query>.+?)\s+on youtube$", _handle_youtube_search),
 ]

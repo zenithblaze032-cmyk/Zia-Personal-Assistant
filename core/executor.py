@@ -15,7 +15,14 @@ class AgentNovaExecutor:
                 self.agent = agentkthx.Agent(
                     model="llama3.2:3b",
                     tools=["shell", "read_file", "write_file", "list_directory", "web-search"],
-                    system_prompt="You are Zia, an autonomous local agent. Fulfill the user's task."
+                    system_prompt=(
+                        "You are Zia, an autonomous local agent on a WINDOWS machine.\n"
+                        "The user's Desktop path is: \"C:\\Users\\Ayush Kumar\\Desktop\"\n"
+                        "The user's Documents path is: \"C:\\Users\\Ayush Kumar\\Documents\"\n"
+                        "IMPORTANT: Always wrap file paths in quotes (e.g. \"C:\\path\\to\\file\") when using the shell tool.\n"
+                        "If built-in file tools return security errors, fallback to using the `shell` tool with Windows CMD/PowerShell commands (e.g. `dir`, `type`).\n"
+                        "CRITICAL: When using a tool, you MUST output ONLY the exact tool call format required. Do NOT include any conversational text like 'I will now run...' before the tool call."
+                    )
                 )
             except ImportError:
                 self.agent = None
@@ -48,11 +55,13 @@ class AgentNovaExecutor:
                 future = pool.submit(self.agent.run, text)
                 try:
                     result = future.result(timeout=AGENTNOVA_TIMEOUT_SEC)
-                    # Attempt to extract response
-                    if hasattr(result, "response"):
-                        return result.response
-                    elif hasattr(result, "content"):
-                        return result.content
+                    # Attempt to extract response cleanly
+                    if hasattr(result, "final_answer") and result.final_answer:
+                        return str(result.final_answer)
+                    elif hasattr(result, "response") and result.response:
+                        return str(result.response)
+                    elif hasattr(result, "content") and result.content:
+                        return str(result.content)
                     return str(result)
                 except concurrent.futures.TimeoutError:
                     return f"The task took longer than {AGENTNOVA_TIMEOUT_SEC} seconds and was aborted."

@@ -29,37 +29,37 @@ def generate_chat(messages: List[Dict[str, Any]], use_tools: bool = True) -> str
         ollama_tools = []
         if use_tools:
             for func in available_tools:
-            import inspect
-            sig = inspect.signature(func)
-            doc = inspect.getdoc(func) or ""
-            
-            properties = {}
-            required = []
-            for name, param in sig.parameters.items():
-                param_type = "string"
-                if param.annotation != inspect.Parameter.empty:
-                    if param.annotation == int:
-                        param_type = "integer"
-                    elif param.annotation == bool:
-                        param_type = "boolean"
-                    elif param.annotation == float:
-                        param_type = "number"
-                properties[name] = {"type": param_type, "description": f"Parameter {name}"}
-                if param.default == inspect.Parameter.empty:
-                    required.append(name)
-                    
-            ollama_tools.append({
-                "type": "function",
-                "function": {
-                    "name": func.__name__,
-                    "description": doc,
-                    "parameters": {
-                        "type": "object",
-                        "properties": properties,
-                        "required": required
+                import inspect
+                sig = inspect.signature(func)
+                doc = inspect.getdoc(func) or ""
+                
+                properties = {}
+                required = []
+                for name, param in sig.parameters.items():
+                    param_type = "string"
+                    if param.annotation != inspect.Parameter.empty:
+                        if param.annotation == int:
+                            param_type = "integer"
+                        elif param.annotation == bool:
+                            param_type = "boolean"
+                        elif param.annotation == float:
+                            param_type = "number"
+                    properties[name] = {"type": param_type, "description": f"Parameter {name}"}
+                    if param.default == inspect.Parameter.empty:
+                        required.append(name)
+                        
+                ollama_tools.append({
+                    "type": "function",
+                    "function": {
+                        "name": func.__name__,
+                        "description": doc,
+                        "parameters": {
+                            "type": "object",
+                            "properties": properties,
+                            "required": required
+                        }
                     }
-                }
-            })
+                })
             
         while True:
             chat_kwargs = {
