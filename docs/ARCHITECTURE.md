@@ -1,52 +1,25 @@
 # System Architecture
 
-Zia is structured as a central listening loop (`Zia.py`) with a modular skills system.
+Zia is structured as a central listening loop (`Zia.py`) with a hybrid routing and multi-agent system.
 
 ## Directory Layout
-
-```
-Zia.py          ← Main loop: audio capture, wake word, state machine
+```text
+Zia.py          ← Main loop: audio capture, state machine
 core/
-  context.py       ← Context object (ctx.say, ctx.sleep, ctx.shutdown)
+  asr.py           ← ASR pipeline (Google Speech + Agent-SDK fallback)
+  brain.py         ← EffGen complexity router & prompt compression
+  context.py       ← Context object passed to skills
+  executor.py      ← AgentKthx (Nova) wrapper with safety limits
+  llm.py           ← Llama 3.2 bindings
+  memory.py        ← EffGen RAG Database wrapper
   router.py        ← Regex-based skill dispatcher
-  piper_tts.py     ← Offline Piper TTS wrapper
-skills/
-  __init__.py      ← Registers all skill modules
-  apps.py          ← Open apps and websites
-  system.py        ← Time, date, volume, screenshot, lock, help
-  web.py           ← Google and YouTube search
-  media.py         ← Media playback controls
+skills/            ← Fast-path local regex tools
 ```
 
-## State Machine
-
-Zia has two states:
-
-```
-ASLEEP ──── "Zia" (wake word) ────► AWAKE
-  ▲                                      │
-  │         "Go to sleep"                │ Commands dispatched
-  └──────────────────────────────────────┘ to Router
-  ▲
-  └── Idle for 30s (auto-sleep)
-```
-
-## Audio Pipeline
-
-```
-Microphone (16 kHz)
-  → Gain amplification (×4.0)
-  → Vosk STT (offline, local)
-  → State machine check
-  → Router.dispatch(text, ctx)
-  → Skill handler
-  → ctx.say(response)
-  → Piper TTS (offline) or Edge TTS (fallback)
-```
-
-## Key Design Decisions
-
-- **Mic muting during TTS**: While Zia speaks, the microphone loop is paused + a 1.5s cooldown after — so Zia never hears its own voice.
-- **Post-wake cooldown**: After waking up, audio is ignored for 3 seconds so the wake word's own echo doesn't trigger a command.
-- **Final-only dispatch**: Commands only fire on Vosk's _Final_ results (not partials) to prevent half-heard words triggering actions.
-- **Error isolation**: Each skill handler is wrapped in try/except inside the Router — a broken skill never crashes Zia.
+## Processing Flow
+1. **Audio Capture**: `core/asr.py` handles chunked listening.
+2. **Regex Router**: Tries to match fast skills (e.g. screenshot, volume) via `core/router.py`.
+3. **Brain Routing**: Unmatched commands hit `core/brain.py` (EffGen) to classify as `SIMPLE` or `MULTI_STEP`.
+4. **Execution**:
+   - `SIMPLE`: RAG memory injected -> Llama 3.2 answers directly.
+   - `MULTI_STEP`: Sent to `core/executor.py` (AgentNova) to perform OS actions with shell tools.

@@ -14,6 +14,7 @@ class AgentNovaExecutor:
                 # Initializing agent with shell and standard tools
                 self.agent = agentkthx.Agent(
                     model="llama3.2:3b",
+                    tools=["shell", "read_file", "write_file", "list_directory", "web-search"],
                     system_prompt="You are Zia, an autonomous local agent. Fulfill the user's task."
                 )
             except ImportError:

@@ -11,3 +11,4 @@ graphify-out/
 *.zip
 memory.txt
 *.env
+.memory.db

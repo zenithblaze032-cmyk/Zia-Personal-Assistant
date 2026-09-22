@@ -1,23 +1,56 @@
-# Zia Manual Test Commands
+Zia Voice Commands Quick Reference
 
-Read these out loud to test the newly installed STT pipeline from agent-sdk-core (Phase 1), as well as upcoming features in later phases.
+SYSTEM CONTROLS
+- "What's the time?" / "Time"
+- "What's the date?" / "Date"
+- "Volume up" / "Louder"
+- "Volume down" / "Quieter"
+- "Mute" / "Shut up"
+- "Take a screenshot" / "Grab a screenshot"
+- "What is on my screen?" / "Analyze my screen" (Uses Moondream Vision)
+- "Lock pc" / "Lock screen"
+- "Who are you?" / "Help" / "List commands"
 
-## Phase 1: Environment & STT Foundation Testing
-*Test if the new agent-sdk-core speech-to-text pipeline is working.*
+MEDIA CONTROLS
+- "Play" / "Pause" / "Resume"
+- "Next" / "Skip"
+- "Previous" / "Go back"
+- "Stop"
 
-- "Zia, what's the time?"
-- "Zia, open chrome"
-- "Zia, who are you?"
+WORKSPACES & ROUTINES
+- "Start DSA work" / "Open data structures"
+- "Start web dev work" / "Open development"
+- "Start Zia work"
+- "Start hackathon work"
 
-## Phase 2: Memory & Brain Routing Testing (Upcoming)
-*Tests if EffGen correctly routes SIMPLE commands vs TOOL commands.*
+WEB SEARCH
+- "Google [query]" / "Open a google search for [query]"
+- "Play [query] on youtube"
 
-- "Zia, what's the weather?" (Should trigger EffGen SIMPLE -> LLM)
-- "Zia, remember that my favorite color is blue." (Tests agent-sdk-core RAG memory injection)
-- "Zia, what is my favorite color?" (Tests memory retrieval)
+WEATHER & TIMERS
+- "What is the weather?" / "Weather today"
+- "Set a timer for [X] hours [Y] minutes [Z] seconds"
 
-## Phase 3 & 4: Execution & Safety Testing (Upcoming)
-*Tests if AgentNova executes shell tools and warns on dangerous commands.*
+WINDOW MANAGEMENT
+- "Snap [app] to the left"
+- "Snap [app] to the right"
+- "Maximize [app]"
 
-- "Zia, find my latest screenshot and describe it." (EffGen MULTI_STEP -> AgentNova file ops + moondream)
-- "Zia, delete all files in my Downloads folder." (AgentNova TOOL -> Should trigger a safety confirmation warning!)
+CLIPBOARD & AUTOMATION
+- "Read my clipboard"
+- "Save my clipboard"
+- "Move mouse up/down/left/right by [X]"
+- "Click" / "Double click" / "Right click"
+- "Write an email/letter/paragraph about [topic]" (Generates text and types it out automatically)
+
+MEMORY (EffGen RAG)
+- "Take a note that [note]" / "Remember [fact]" -> Saves to local vector database.
+- Ask questions about facts, e.g., "What is my favorite color?" -> Routes to LLM with injected RAG memory.
+
+COMPLEX TASKS (AgentNova)
+- "Delete the temp files" -> Executes shell commands (asks for confirmation first).
+- "Read the file on my desktop and summarize it" -> Uses AgentNova's OS tools.
+
+PROGRAM CONTROL
+- "Shut down Zia" -> Exits program.
+- "Go to sleep" -> Enters standby mode (waiting for wake word).
