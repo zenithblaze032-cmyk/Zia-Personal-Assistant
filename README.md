@@ -1,15 +1,41 @@
 # Zia 🎙️
 
-A fast, fully offline, hybrid personal assistant for Windows. It automates desktop tasks and handles complex OS operations through simple voice commands.
+A blazingly fast, hybrid AI-powered personal assistant built exclusively for Windows. Zia moves beyond basic chatbots by integrating deeply into the OS, bridging the gap between natural language and local system automation. 
 
-## Architecture Highlights
-- **Vosk**: Instant, offline wake word detection.
-- **Piper TTS**: Fast, local text-to-speech for seamless conversations.
-- **EffGen**: Cognitive complexity router and RAG memory database.
-- **AgentKthx (Nova)**: Autonomous local agent for complex shell, file, and web tasks.
-- **Llama 3.2**: Powers all local reasoning and generation.
+## 🚀 Core Features
 
-## How it Works
-1. Say **"wake up"** to enter listening mode.
-2. Issue commands — simple commands are routed via fast Regex, memory queries are injected with RAG, and complex OS tasks are handled by AgentNova.
-3. Say **"Go to sleep"** to return to standby, or **"Shut down"** to exit.
+- **Hybrid Architecture**: Fast and accurate voice recognition powered by Google Speech API, while keeping text-to-speech (Piper) and LLM reasoning (Llama 3.2 via Ollama) 100% local on your machine for maximum privacy and performance.
+- **AgentNova OS Integration**: Zia doesn't just talk; she acts. Powered by AgentKthx, she can minimize/maximize windows, control system volume, press hotkeys, manage files, and execute PowerShell commands.
+- **Headless Web Browsing**: Ask a question, and Zia will silently search the web, fetch the HTML, strip out the noise, and read you a concise summary of the page.
+- **Proactive Intelligence (Continuous Memory)**: Say *"Go to sleep"* and Zia spins up a background agent. It reads your recent conversation, extracts your habits, facts, and preferences, and permanently injects them into her local RAG vector database (EffGen). 
+- **Vision Capabilities**: Tell Zia to *"Analyze my screen"* and she uses Moondream Vision models to take a screenshot and tell you exactly what you're looking at.
+
+## 🏗️ Architecture
+
+Zia uses a sophisticated routing engine to ensure sub-second response times:
+1. **STT (Speech-to-Text)**: Google Speech API continually listens for the wake word with high accuracy and low latency.
+2. **The Router**: 
+   - *Regex Fast-Path*: Simple commands (e.g. "Take a screenshot", "Lock PC") bypass the LLM entirely and execute instantly.
+   - *EffGen RAG*: Personal questions query the local SQLite vector database and inject context into the prompt.
+   - *AgentNova Executor*: Complex multi-step requests (e.g. "Read the file on my desktop", "Search Wikipedia") are handed to the AgentKthx loop which iteratively uses OS tools to solve the goal.
+3. **TTS (Text-to-Speech)**: Responses are synthesized via local Piper TTS, with built-in audio echo cancellation so Zia doesn't trigger her own wake word while speaking.
+
+## 🛠️ Installation & Setup
+
+1. **Prerequisites**: 
+   - Ensure Python 3.10+ is installed.
+   - Install [Ollama](https://ollama.com/) and pull the required models: `ollama run llama3.2` and `ollama run moondream`.
+2. **Install Dependencies**:
+   ```bash
+   pip install -r requirements.txt
+   ```
+3. **Run**:
+   Simply execute the batch script to launch the assistant:
+   ```cmd
+   run.bat
+   ```
+
+## 📖 Documentation
+- **[Commands Reference](commands.txt)**: A full list of voice commands Zia understands.
+- **[Testing Scenarios](testing.md)**: End-to-end manual testing procedures to verify the OS, Web, and RAG subsystems.
+- **[Project Roadmap](docs/IMPROVEMENTS.md)**: The phased development plan outlining how Zia was built.

@@ -9,9 +9,9 @@ core/
   asr.py           ← ASR pipeline (Google Speech + Agent-SDK fallback)
   brain.py         ← EffGen complexity router & prompt compression
   context.py       ← Context object passed to skills
-  executor.py      ← AgentKthx (Nova) wrapper with safety limits
+  executor.py      ← AgentKthx (Nova) wrapper with safety limits and OS/Web tools
   llm.py           ← Llama 3.2 bindings
-  memory.py        ← EffGen RAG Database wrapper
+  memory.py        ← EffGen RAG Database wrapper and Background Consolidation Agent
   router.py        ← Regex-based skill dispatcher
 skills/            ← Fast-path local regex tools
 ```

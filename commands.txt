@@ -3,16 +3,16 @@ Zia Voice Commands Quick Reference
 SYSTEM CONTROLS
 - "What's the time?" / "Time"
 - "What's the date?" / "Date"
-- "Volume up" / "Louder"
-- "Volume down" / "Quieter"
-- "Mute" / "Shut up"
-- "Take a screenshot" / "Grab a screenshot"
+- "Volume up" / "Louder" (AgentNova)
+- "Volume down" / "Quieter" (AgentNova)
+- "Mute my volume" / "Shut up" (AgentNova)
+- "Take a screenshot" / "Grab a screenshot" (AgentNova)
 - "What is on my screen?" / "Analyze my screen" (Uses Moondream Vision)
 - "Lock pc" / "Lock screen"
 - "Who are you?" / "Help" / "List commands"
 
 MEDIA CONTROLS
-- "Play" / "Pause" / "Resume"
+- "Play" / "Pause" / "Resume" (AgentNova)
 - "Next" / "Skip"
 - "Previous" / "Go back"
 - "Stop"
@@ -23,18 +23,21 @@ WORKSPACES & ROUTINES
 - "Start Zia work"
 - "Start hackathon work"
 
-WEB SEARCH
+WEB SEARCH & BROWSING
 - "Google [query]" / "Open a google search for [query]"
 - "Play [query] on youtube"
+- "Search Wikipedia for [topic], read the article, and summarize it" (AgentNova)
+- "Go to [url] and read it to me" (AgentNova)
 
 WEATHER & TIMERS
 - "What is the weather?" / "Weather today"
 - "Set a timer for [X] hours [Y] minutes [Z] seconds"
 
-WINDOW MANAGEMENT
+WINDOW MANAGEMENT (AgentNova)
 - "Snap [app] to the left"
 - "Snap [app] to the right"
-- "Maximize [app]"
+- "Maximize [app window]"
+- "Minimize [app window]"
 
 CLIPBOARD & AUTOMATION
 - "Read my clipboard"
@@ -43,14 +46,16 @@ CLIPBOARD & AUTOMATION
 - "Click" / "Double click" / "Right click"
 - "Write an email/letter/paragraph about [topic]" (Generates text and types it out automatically)
 
-MEMORY (EffGen RAG)
-- "Take a note that [note]" / "Remember [fact]" -> Saves to local vector database.
+MEMORY & PROACTIVE INTELLIGENCE
+- "Take a note that [note]" / "Remember [fact]" -> Saves explicitly to local vector database.
 - Ask questions about facts, e.g., "What is my favorite color?" -> Routes to LLM with injected RAG memory.
+- "Go to sleep" -> Enters standby mode. Silently triggers a background agent to read your recent conversation transcript and proactively consolidate facts and preferences into long-term RAG memory.
 
 COMPLEX TASKS (AgentNova)
 - "Delete the temp files" -> Executes shell commands (asks for confirmation first).
 - "Read the file on my desktop and summarize it" -> Uses AgentNova's OS tools.
+- "Create a new text file on my desktop called 'todo' and write 'buy milk'" -> Uses AgentNova file tools.
 
 PROGRAM CONTROL
 - "Shut down Zia" -> Exits program.
-- "Go to sleep" -> Enters standby mode (waiting for wake word).
+- "Go to sleep" -> Enters standby mode (waiting for wake word) and triggers memory consolidation.

@@ -27,3 +27,17 @@ Follow these steps to manually verify Zia's subsystems after any codebase upgrad
 - **Expected**: The state machine catches the confirmation and AgentNova executes the deletion.
 - **Action (Alternative)**: Say "cancel"
 - **Expected**: The state machine resets and aborts the operation.
+
+## 6. Headless Web Browsing (Phase 2)
+- **Action**: Say "Search Wikipedia for Quantum Computing, read the article, and give me a short summary."
+- **Expected**: AgentNova chains `web-search` with `fetch_webpage` to download the HTML, strip tags, and generate a summary for TTS playback.
+
+## 7. Deep OS & System Integration (Phase 3)
+- **Action**: Say "Maximize the Notepad window" or "Minimize my browser."
+- **Expected**: AgentNova uses `maximize_window` or `minimize_window` from `pygetwindow` to adjust the window state.
+- **Action**: Say "Mute my volume."
+- **Expected**: AgentNova uses the `press_keys` tool to send the `volumemute` hotkey via `pyautogui`.
+
+## 8. Proactive Memory Consolidation (Phase 4)
+- **Action**: Tell Zia a personal fact, wait for her reply, then say "Go to sleep."
+- **Expected**: Zia enters the `ASLEEP` state. In the background, the console logs should show the `consolidate_memory` agent waking up, running the LLM against the short-term transcript, and extracting the fact to the RAG database (`Saved to LTM: ...`).

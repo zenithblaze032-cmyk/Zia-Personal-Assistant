@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.4.0] - The Deep Integration Upgrade
+### Added
+- Implemented **Headless Web Browsing**: AgentNova can now fetch and summarize web pages.
+- Added **Deep OS Integration**: Added `pygetwindow` and `pyautogui` tools for window management (minimize/maximize) and system volume control.
+- Added **Proactive Intelligence**: A background agent triggered by the "Go to sleep" command automatically reads transcripts and consolidates facts into EffGen long-term memory.
+- Updated documentation across the repository and regenerated the Graphify project map.
 ## [0.3.0] - The Agentic Upgrade
 ### Added
 - Integrated **EffGen** for RAG long-term memory (`memory.db`) and intent classification.
