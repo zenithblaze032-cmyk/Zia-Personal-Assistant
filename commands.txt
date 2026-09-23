@@ -75,7 +75,7 @@ Zia can instantly set up your entire coding environment (opening VS Code, specif
 • "Type 'hello' into the search bar" (Zia finds the search bar, clicks it, and types)
 
 -------------------------------------------------------------
-9. CONFIRMED MESSAGING (VOICE TEXTING)
+9. CONFIRMED MESSAGING (VOICE TEXTING) not working now, will be fixed soon.
 -------------------------------------------------------------
 • "Message Ayush saying I'll be late on WhatsApp"
 • "Text Mom that I am coming home on Telegram"

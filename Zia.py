@@ -21,6 +21,13 @@ from core.executor import AgentNovaExecutor
 import pystray
 from PIL import Image, ImageDraw
 
+# Screenshots and mouse coordinates must share one pixel space before anything
+# measures the screen. Without this, vision clicking is off by the display
+# scaling factor on any scaled Windows display.
+from core.screen import init_dpi_awareness
+
+init_dpi_awareness()
+
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s %(levelname)s %(message)s",
@@ -82,6 +89,14 @@ def _strip_wake_prefix(text: str) -> str:
 def _dispatch(text: str) -> None:
     text = _strip_wake_prefix(text)
     if not text:
+        st.last_activity = time.monotonic()
+        return
+
+    # A skill waiting on a yes/no answer (for example "Should I send it?")
+    # consumes this utterance before it reaches the router, so the reply cannot
+    # be misread as a new command.
+    from core.pending import dispatch_interceptor
+    if dispatch_interceptor(text):
         st.last_activity = time.monotonic()
         return
 

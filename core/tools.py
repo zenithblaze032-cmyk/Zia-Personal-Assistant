@@ -219,6 +219,20 @@ def click_on_screen(element_description: str) -> str:
         element_description: What to click on (e.g. 'Submit button', 'Search bar', 'X icon').
     """
     try:
+        from core.screen import click_element
+        ok, message = click_element(element_description)
+        return message if ok else f"Failed: {message}"
+    except Exception as e:
+        return f"Error executing click_on_screen: {e}"
+
+
+def _legacy_click_on_screen(element_description: str) -> str:
+    """
+    Finds a UI element on the screen based on the description and clicks it using the mouse.
+    Args:
+        element_description: What to click on (e.g. 'Submit button', 'Search bar', 'X icon').
+    """
+    try:
         import google.generativeai as genai
         from PIL import Image
         import tempfile
@@ -272,7 +286,22 @@ def type_on_screen(element_description: str, text: str) -> str:
         element_description: The text box to find (e.g. 'Search bar', 'Chat input').
         text: The text to type into the box.
     """
-    click_res = click_on_screen(element_description)
+    try:
+        from core.screen import type_into_element
+        ok, message = type_into_element(element_description, text)
+        return message if ok else f"Failed: {message}"
+    except Exception as e:
+        return f"Error executing type_on_screen: {e}"
+
+
+def _legacy_type_on_screen(element_description: str, text: str) -> str:
+    """
+    Finds a text field on the screen based on the description, clicks it, and types the text.
+    Args:
+        element_description: The text box to find (e.g. 'Search bar', 'Chat input').
+        text: The text to type into the box.
+    """
+    click_res = _legacy_click_on_screen(element_description)
     if "Error" in click_res or "Failed" in click_res:
         return click_res
         

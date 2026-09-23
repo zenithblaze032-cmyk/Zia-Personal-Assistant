@@ -1,7 +1,10 @@
 import os
 import requests
 from dotenv import load_dotenv
-import google.generativeai as genai
+try:
+    from google import genai
+except ImportError:
+    genai = None
 
 load_dotenv()
 
@@ -36,12 +39,11 @@ def print_gemini_models():
         print("Missing API key.")
         return
 
-    genai.configure(api_key=api_key)
     try:
-        models = genai.list_models()
+        client = genai.Client(api_key=api_key)
+        models = client.models.list()
         for m in models:
-            if "generateContent" in m.supported_generation_methods:
-                print(m.name)
+            print(m.name)
     except Exception as e:
         print(f"Error: {e}")
 

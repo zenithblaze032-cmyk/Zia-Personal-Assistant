@@ -17,13 +17,15 @@ except ImportError:
     OpenAI = None
 
 try:
-    import google.generativeai as genai
+    from google import genai
 except ImportError:
     genai = None
 
 # Attempt to configure Gemini if available
 if genai and os.environ.get("GEMINI_API_KEY"):
-    genai.configure(api_key=os.environ.get("GEMINI_API_KEY"))
+    gemini_client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY"))
+else:
+    gemini_client = None
 
 
 def build_openai_tools():
@@ -135,32 +137,55 @@ def call_openai_compatible(messages, use_tools, base_url, api_key, model_name):
 
 
 def call_gemini(messages, use_tools):
-    if not genai:
-        raise ImportError("google-generativeai package not installed")
+    if not genai or not gemini_client:
+        raise ImportError("google-genai package not installed or client not configured")
 
-    # Let's try the safest string for Gemini
-    model = genai.GenerativeModel(
-        'gemini-flash-latest', tools=available_tools if use_tools else None)
+    # Build tools for Gemini
+    gemini_tools = []
+    if use_tools:
+        # We can just map our available_tools or let the google-genai SDK handle it 
+        # (the SDK allows passing callables directly).
+        gemini_tools = available_tools
 
-    # Very basic message conversion for Gemini (can be improved)
     gemini_history = []
+    for m in messages[:-1]:
+        role = "user" if m["role"] in ["user", "system"] else "model"
+        # The new SDK takes types.Content for history
+        gemini_history.append(genai.types.Content(role=role, parts=[genai.types.Part.from_text(m["content"])]))
+
+    chat = gemini_client.chats.create(
+        model="gemini-1.5-flash",
+        config=genai.types.GenerateContentConfig(
+            tools=gemini_tools if gemini_tools else None
+        )
+    )
+    # the new SDK chat does not accept history in the same way, let's just use generate_content
+    # wait, instead of using chats.create with history, we can just use generate_content with contents array
+    contents = []
     for m in messages:
         role = "user" if m["role"] in ["user", "system"] else "model"
-        gemini_history.append({"role": role, "parts": [m["content"]]})
+        contents.append(genai.types.Content(role=role, parts=[genai.types.Part.from_text(m["content"])]))
 
-    chat = model.start_chat(history=gemini_history[:-1])
-    response = chat.send_message(messages[-1]["content"])
+    response = gemini_client.models.generate_content(
+        model="gemini-1.5-flash",
+        contents=contents,
+        config=genai.types.GenerateContentConfig(
+            tools=gemini_tools if gemini_tools else None
+        )
+    )
     return response.text
 
 
 def call_gemini_vision(prompt: str, image_bytes: bytes) -> str:
     """Analyze an image with Gemini when a Zen API key is available."""
-    if not genai:
-        raise ImportError("google-generativeai package not installed")
+    if not genai or not gemini_client:
+        raise ImportError("google-genai package not installed or client not configured")
 
-    model = genai.GenerativeModel("gemini-flash-latest")
     image = Image.open(BytesIO(image_bytes))
-    response = model.generate_content([prompt, image])
+    response = gemini_client.models.generate_content(
+        model="gemini-1.5-flash",
+        contents=[prompt, image]
+    )
     return response.text or "I couldn't find anything useful on the screen."
 
 

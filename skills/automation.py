@@ -125,9 +125,82 @@ def _handle_press_key(match: re.Match, ctx: Context) -> None:
         ctx.say(f"I don't know how to press the {key} key.")
 
 # ---------------------------------------------------------------------------
+# Vision-driven screen interaction
+#
+# These handlers ground a described element with the vision engine instead of
+# clicking wherever the cursor happens to be. They are registered *before* the
+# blind click/type patterns below, because the old ``\b(click)\b`` pattern also
+# matched "click on the Submit button" and turned it into a no-op click at the
+# current cursor position.
+# ---------------------------------------------------------------------------
+def _handle_vision_click(match: re.Match, ctx: Context) -> None:
+    target = (match.group("element") or "").strip(" .")
+    if not target:
+        ctx.say("What should I click, sir?")
+        return
+
+    from core.screen import click_element
+
+    ctx.say(f"Looking for the {target}.")
+    log.info("Vision click: %r", target)
+    ok, message = click_element(target)
+    if ok:
+        ctx.say(f"Clicked the {target}.")
+    else:
+        log.warning("Vision click failed for %r: %s", target, message)
+        ctx.say(f"I couldn't find the {target} on screen, sir.")
+
+
+def _handle_vision_type(match: re.Match, ctx: Context) -> None:
+    text = (match.group("text") or "").strip()
+    element = (match.group("element") or "").strip(" .")
+    if not text or not element:
+        ctx.say("Tell me what to type and where, sir.")
+        return
+
+    from core.screen import type_into_element
+
+    ctx.say(f"Finding the {element}.")
+    log.info("Vision type: %r into %r", text, element)
+    ok, message = type_into_element(element, text)
+    if ok:
+        ctx.say(f"Typed it into the {element}.")
+    else:
+        log.warning("Vision type failed for %r: %s", element, message)
+        ctx.say(f"I couldn't find the {element}, sir.")
+
+
+def _handle_focus_search(match: re.Match, ctx: Context) -> None:
+    from core.screen import click_element
+
+    ctx.say("Looking for the search bar.")
+    ok, message = click_element(
+        "the search input field where a user types a query")
+    if ok:
+        ctx.say("The search bar is ready, sir.")
+    else:
+        log.warning("Focus search failed: %s", message)
+        ctx.say("I couldn't find a search bar on screen, sir.")
+
+
+# ---------------------------------------------------------------------------
 # Registration
 # ---------------------------------------------------------------------------
 PATTERNS = [
+    # --- vision-first patterns (must precede the blind click/type ones) ----
+    # "type hello into the search bar", "write I am late in the message box"
+    (r"^(?:please\s+)?(?:type|write|enter|put)\s+(?P<text>.+?)\s+"
+     r"(?:in|into|inside|on)\s+(?:the\s+|my\s+)?(?P<element>.+?)\s*$",
+     _handle_vision_type),
+    # "go to the search bar", "focus the search bar", "move to search"
+    (r"^(?:please\s+)?(?:go\s+to|focus(?:\s+on)?|move\s+to|get\s+to)\s+"
+     r"(?:the\s+|my\s+)?(?:search\s*(?:bar|box|field)?|search)\s*$",
+     _handle_focus_search),
+    # "click on the Submit button", "click the search bar", "tap the X icon"
+    (r"^(?:please\s+)?(?:click|tap)\s+(?:on\s+|onto\s+)?(?:the\s+|my\s+)?"
+     r"(?P<element>[A-Za-z0-9][^.!?]{0,60}?)\s*$",
+     _handle_vision_click),
+    # --- direct input -----------------------------------------------------
     (r"\b(?:move )?mouse (?P<dir>up|down|left|right)(?: by (?P<amount>\d+))?\b", _handle_move_mouse),
     (r"\b(?P<type>right click|double click|click)\b", _handle_click),
     (r"\b(?:generate and type|draft and type|write a(?:n)? (?P<doc>email|file|letter|paragraph|essay|story|script|code|message|poem) about|write about)\s+(?P<topic>.+)\b", _handle_generate_and_type),

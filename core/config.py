@@ -129,3 +129,18 @@ USE_AGENTSDK_STT = (os.environ.get("USE_AGENTSDK_STT") or "False").strip().lower
 AGENTNOVA_CONFIRM_DANGEROUS = (os.environ.get("AGENTNOVA_CONFIRM_DANGEROUS") or "True").strip().lower() in ("true", "1", "yes")
 AGENTNOVA_TIMEOUT_SEC = int(_env_float("AGENTNOVA_TIMEOUT_SEC", 120))
 EFFGEN_COMPRESS_PROMPTS = (os.environ.get("EFFGEN_COMPRESS_PROMPTS") or "True").strip().lower() in ("true", "1", "yes")
+
+# ---------------------------------------------------------------------------
+# Vision grounding (screen clicking / typing)
+# ---------------------------------------------------------------------------
+# The strong model used to locate UI elements must be a *grounding* capable
+# model. The local moondream vision model is kept for describing the screen,
+# but it cannot return usable bounding boxes, so grounding is cloud-backed and
+# degrades to a clear failure when no key is configured.
+USE_VISION_GROUNDING = (os.environ.get("USE_VISION_GROUNDING") or "True").strip().lower() in ("true", "1", "yes")
+VISION_GROUNDING_TIMEOUT = _env_float("VISION_GROUNDING_TIMEOUT", 25.0)
+VISION_MIN_BOX_FRACTION = _env_float("VISION_MIN_BOX_FRACTION", 0.0001)
+VISION_MAX_BOX_FRACTION = _env_float("VISION_MAX_BOX_FRACTION", 0.98)
+# Seconds to wait for a freshly opened web app (WhatsApp Web, Instagram) to
+# become interactive before attempting to ground anything inside it.
+WEB_APP_READY_TIMEOUT = _env_float("WEB_APP_READY_TIMEOUT", 18.0)

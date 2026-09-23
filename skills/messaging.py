@@ -1,55 +1,63 @@
-import re
+from __future__ import annotations
+
 import logging
+import re
+import threading
 import time
-import pyautogui
-import speech_recognition as sr
+import webbrowser
+
 from core.context import Context
-from core.tools import type_on_screen
+from core.pending import clear_interceptor, register_interceptor
+from core.screen import click_element, focus_search, paste_text, press_key, type_into_element
 
 log = logging.getLogger("Zia.skills.messaging")
 
+# Each provider describes *where* to look, not a brittle fixed coordinate.
+# The hint is fed to the vision grounding engine together with a region of
+# interest (see core.screen.PROVIDER_ROIS) so the model only has to disambiguate
+# inside a small crop instead of searching the whole screen.
 PROVIDERS = {
     "whatsapp": {
         "aliases": {"whatsapp", "whatsapp web", "wa", "what's app", "what sapp"},
         "url": "https://web.whatsapp.com/",
         "window": "WhatsApp",
-        "search": "WhatsApp chat search bar",
-        "input": "WhatsApp type a message box at the bottom",
+        "search_hint": "the search box at the top of the chat list on the left side",
+        "input_hint": "the message text box at the bottom of the open chat",
     },
     "telegram": {
         "aliases": {"telegram", "telegram web", "tg"},
         "url": "https://web.telegram.org/a/",
         "window": "Telegram",
-        "search": "Telegram chat search field",
-        "input": "Telegram message input box at the bottom",
+        "search_hint": "the search field at the top of the chat list",
+        "input_hint": "the message input box at the bottom of the open chat",
     },
     "instagram": {
         "aliases": {"instagram", "insta", "ig", "insta gram"},
         "url": "https://www.instagram.com/direct/inbox/",
         "window": "Instagram",
-        "search": "Instagram direct messages search field",
-        "input": "Instagram direct message input box",
+        "search_hint": "the search field at the top of the direct messages list",
+        "input_hint": "the message input box at the bottom of the open conversation",
     },
     "messenger": {
         "aliases": {"messenger", "facebook messenger", "fb messenger"},
         "url": "https://www.messenger.com/",
         "window": "Messenger",
-        "search": "Messenger chat search field",
-        "input": "Messenger message input box",
+        "search_hint": "the search field above the chat list",
+        "input_hint": "the message input box at the bottom of the open chat",
     },
     "discord": {
         "aliases": {"discord"},
         "url": "https://discord.com/app",
         "window": "Discord",
-        "search": "Discord direct message search field",
-        "input": "Discord message input box",
+        "search_hint": "the quick switcher search field",
+        "input_hint": "the message input box at the bottom of the open channel",
     },
     "slack": {
         "aliases": {"slack"},
         "url": "https://app.slack.com/client",
         "window": "Slack",
-        "search": "Slack search field",
-        "input": "Slack message input box",
+        "search_hint": "the search field at the top of the window",
+        "input_hint": "the message input box at the bottom of the open conversation",
     },
 }
 
@@ -59,18 +67,85 @@ _PROVIDER_ALIASES = {
     for alias in config["aliases"]
 }
 
-AUTOMATED_MESSAGES = {
-    ("ayush", "instagram"): "Heelo i am the best",
-}
+# NOTE: a hardcoded default message used to live here
+# (``AUTOMATED_MESSAGES = {("ayush", "instagram"): "Heelo i am the best"}``).
+# It meant "text Ayush on Instagram" silently sent a canned test string to a
+# real person. A message must always come from the user, so that fallback is
+# gone: an empty message now asks the user for the text instead.
 
 
 def _normalize_provider(value: str) -> str | None:
     return _PROVIDER_ALIASES.get(" ".join(value.lower().split()))
 
 
-def _recipient_key(value: str) -> str:
-    """Normalize a spoken username for automation lookup."""
-    return value.strip().lstrip("@").lower()
+def _provider_titles(provider: str) -> set[str]:
+    """Window title fragments that identify a provider's browser tab/app."""
+    config = PROVIDERS[provider]
+    return {config["window"].lower(), *[a.lower() for a in config["aliases"]]}
+
+
+def _find_provider_window(provider: str):
+    """Return the first open window belonging to ``provider``, or None."""
+    try:
+        import pygetwindow as gw
+    except ImportError:
+        log.warning("Messaging: pygetwindow missing; cannot focus %s", provider)
+        return None
+
+    titles = _provider_titles(provider)
+    for window in gw.getAllWindows():
+        title = (window.title or "").lower()
+        if title and any(fragment in title for fragment in titles):
+            return window
+    return None
+
+
+def _focus_provider(provider: str, timeout: float | None = None) -> bool:
+    """
+    Focus the provider's window, opening the web app if it is not running.
+
+    Replaces a blind ``time.sleep(10)`` with a poll for the window to actually
+    appear, so a slow or partially-loaded page is not acted on too early — the
+    main reason a search field could not be found straight after opening
+    WhatsApp Web or Instagram.
+    """
+    from core.config import WEB_APP_READY_TIMEOUT
+
+    if timeout is None:
+        timeout = WEB_APP_READY_TIMEOUT
+
+    config = PROVIDERS[provider]
+    window = _find_provider_window(provider)
+
+    if window is None:
+        log.info("Messaging: opening %s at %s", provider, config["url"])
+        try:
+            webbrowser.open(config["url"])
+        except Exception as exc:
+            log.error("Messaging: could not open %s: %s", provider, exc)
+            return False
+
+        deadline = time.monotonic() + timeout
+        while time.monotonic() < deadline:
+            time.sleep(1.0)
+            window = _find_provider_window(provider)
+            if window is not None:
+                break
+        else:
+            log.warning("Messaging: %s window never appeared within %.0fs",
+                        provider, timeout)
+            return False
+
+    try:
+        window.restore()
+        window.activate()
+    except Exception:
+        log.debug("Could not activate existing %s window",
+                  provider, exc_info=True)
+
+    # Give the tab a moment to paint after being raised.
+    time.sleep(1.2)
+    return True
 
 
 def parse_message_command(command: str) -> tuple[str, str, str] | None:
@@ -101,53 +176,84 @@ def parse_message_command(command: str) -> tuple[str, str, str] | None:
         person, message = (words[0], words[1]) if len(
             words) == 2 else (text, "")
 
-    message = message or AUTOMATED_MESSAGES.get(
-        (_recipient_key(person), provider), "")
+    message = message.strip()
     if not person or not message:
         return None
     return person, message, provider
 
 
-def _focus_provider(provider: str) -> bool:
-    import webbrowser
-    import pygetwindow as gw
+# ---------------------------------------------------------------------------
+# Verbal confirmation
+#
+# The previous implementation opened its own ``sr.Microphone()`` stream from
+# inside the skill. The main ASR loop already owns that device and keeps reading
+# it in another thread, so the two competed for the mic — and any reply spoken
+# while Zia was still finishing her question was thrown away by the barge-in
+# branch in core/asr.py.
+#
+# Confirmation is now routed through core.pending: the skill registers an
+# interceptor, Zia.py and asr.py offer each transcript to it, and the skill
+# waits on an event. One microphone owner, no contention, and an answer spoken
+# during TTS is still heard.
+# ---------------------------------------------------------------------------
+_POSITIVE_RE = re.compile(
+    r"\b(yes|yeah|yep|yup|sure|send(?:\s+it)?|confirm(?:ed)?|do\s+it|"
+    r"go\s+ahead|ok(?:ay)?|correct|affirmative)\b")
+# Checked before positives: "don't send it" contains both "don't" and "send".
+_NEGATIVE_RE = re.compile(
+    r"\b(no|nope|nah|don'?t|do\s+not|cancel|stop|abort|discard|negative|wait)\b")
 
-    config = PROVIDERS[provider]
-    titles = {config["window"].lower(), *config["aliases"]}
-    windows = [
-        window
-        for window in gw.getAllWindows()
-        if any(title in (window.title or "").lower() for title in titles)
-    ]
-    if windows:
-        try:
-            windows[0].restore()
-            windows[0].activate()
-        except Exception:
-            log.debug("Could not activate existing %s window",
-                      provider, exc_info=True)
-        time.sleep(1.5)
+
+class _Confirmer:
+    """Consumes the next yes/no answer without touching the microphone."""
+
+    def __init__(self) -> None:
+        self._event = threading.Event()
+        self.answer: bool | None = None
+
+    def handle(self, text: str) -> bool:
+        lowered = (text or "").lower()
+        if _NEGATIVE_RE.search(lowered):
+            self.answer = False
+            self._event.set()
+            return True
+        if _POSITIVE_RE.search(lowered):
+            self.answer = True
+            self._event.set()
+            return True
+        # Unrelated speech is not ours to consume — let it route normally.
+        return False
+
+    def wait(self, timeout: float) -> bool | None:
+        self._event.wait(timeout)
+        return self.answer
+
+
+def _confirm_and_send(ctx: Context, person: str, provider: str,
+                      timeout: float = 20.0) -> bool:
+    """
+    Ask whether to send, and only press Enter on an explicit yes.
+
+    A timeout or an explicit no leaves the text sitting in the chat box
+    unsent rather than guessing.
+    """
+    confirmer = _Confirmer()
+    register_interceptor(confirmer.handle)
+    try:
+        ctx.say(f"The message for {person} is ready. Should I send it?")
+        answer = confirmer.wait(timeout)
+    finally:
+        clear_interceptor(confirmer.handle)
+
+    if answer is True:
+        press_key("enter")
+        time.sleep(0.6)
         return True
+
+    if answer is None:
+        log.info("Messaging: no confirmation heard within %.0fs", timeout)
     else:
-        webbrowser.open(config["url"])
-        time.sleep(10)
-        return True
-
-
-def _confirm_and_send(ctx: Context) -> bool:
-    ctx.say("The message is ready. Should I send it?")
-    recognizer = sr.Recognizer()
-    with sr.Microphone() as source:
-        try:
-            audio = recognizer.listen(source, timeout=7, phrase_time_limit=5)
-            response = recognizer.recognize_google(audio).lower()
-            if any(word in response for word in ("yes", "send", "yeah", "do it")):
-                pyautogui.press("enter")
-                return True
-        except sr.WaitTimeoutError:
-            pass
-        except Exception:
-            log.exception("Error during messaging confirmation")
+        log.info("Messaging: user declined to send")
     return False
 
 
@@ -159,28 +265,51 @@ def _handle_message(match: re.Match, ctx: Context) -> None:
 
     person, message, provider = parsed
     config = PROVIDERS[provider]
-    ctx.say(f"Using {provider} to message {person}.")
-    _focus_provider(provider)
+    recipient = person.strip().lstrip("@")
+    ctx.say(f"Using {provider} to message {recipient}.")
 
-    search_res = type_on_screen(config["search"], person)
-    if "Error" in search_res or "Failed" in search_res:
-        log.error("Vision failed for %s search bar: %s", provider, search_res)
-        ctx.say("I couldn't find the search bar on screen.")
-        return
-    time.sleep(1.5)
-    pyautogui.press("enter")
-    time.sleep(1)
-
-    msg_res = type_on_screen(config["input"], message)
-    if "Error" in msg_res or "Failed" in msg_res:
-        log.error("Vision failed for %s message field: %s", provider, msg_res)
-        ctx.say("I couldn't find the message box.")
+    if not _focus_provider(provider):
+        ctx.say(f"I couldn't open {provider}, sir.")
         return
 
-    if _confirm_and_send(ctx):
-        ctx.say(f"Message sent on {provider}.")
+    # 1. Focus the search field: exact shortcut first, then vision grounding
+    #    constrained to the provider's search region of interest.
+    ok, detail = focus_search(provider, description=config["search_hint"])
+    if not ok:
+        log.info("Messaging: %s search focus failed (%s); grounding instead",
+                 provider, detail)
+        ok, detail = click_element(config["search_hint"],
+                                   provider=provider, role="search")
+    if not ok:
+        log.error("Messaging: could not focus %s search: %s", provider, detail)
+        ctx.say("I couldn't find the search bar, so I stopped.")
+        return
+    time.sleep(0.5)
+
+    # 2. Look the contact up and open the conversation.
+    paste_text(recipient)
+    time.sleep(1.6)
+    press_key("enter")
+    time.sleep(1.6)
+
+    # 3. Write into the composer, verifying that the text actually landed.
+    ok, detail = type_into_element(
+        config["input_hint"], message, provider=provider, role="input")
+    if not ok:
+        log.info("Messaging: composer ROI attempt failed (%s); retrying full screen",
+                 detail)
+        ok, detail = type_into_element(config["input_hint"], message)
+    if not ok:
+        log.error("Messaging: composer not verified for %s: %s", provider, detail)
+        ctx.say("I couldn't put the message in the chat box, "
+                "so I have not sent anything.")
+        return
+
+    # 4. Confirm before sending anything.
+    if _confirm_and_send(ctx, recipient, provider):
+        ctx.say(f"Message sent to {recipient} on {provider}.")
     else:
-        ctx.say("Okay, I will not send it.")
+        ctx.say("Okay, I have not sent it. The text is still in the chat box.")
 
 
 def register(router) -> None:

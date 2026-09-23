@@ -21,6 +21,7 @@ from core.config import (
     USE_AGENTSDK_STT
 )
 from core.state import AssistantState, st
+from core.pending import dispatch_interceptor
 from core.tts import say_text
 
 log = logging.getLogger(__name__)
@@ -186,6 +187,15 @@ class ASRPipeline:
                                 if "sleep" in text:
                                     self._go_sleep()
                                 # Clear buffer so it doesn't process trailing noise
+                                speech_buffer = []
+                                self.user_is_speaking = False
+                            elif dispatch_interceptor(text):
+                                # A skill is waiting on a yes/no answer, and the
+                                # user replied while Zia was still speaking. The
+                                # old code dropped this, so confirmations that
+                                # arrived during the question were never heard.
+                                log.info(
+                                    "Pending: reply consumed during TTS: %r", text)
                                 speech_buffer = []
                                 self.user_is_speaking = False
                         continue
