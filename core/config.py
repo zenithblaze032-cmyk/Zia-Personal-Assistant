@@ -61,6 +61,7 @@ CLAP_THRESHOLD = 3000
 mute_mic = threading.Event()
 tts_active = threading.Event()
 interrupt_event = threading.Event()
+task_abort_event = threading.Event()
 
 # Distinct phrases that will interrupt Zia when she is speaking
 INTERRUPT_PHRASES = [

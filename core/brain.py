@@ -26,27 +26,16 @@ class Brain:
         """
         Classifies a user command into SIMPLE, TOOL, or MULTI_STEP.
         """
-        prompt = (
-            "Classify the following command into exactly one of three categories: "
-            "SIMPLE, TOOL, or MULTI_STEP.\n\n"
-            "Categories:\n"
-            "- SIMPLE: Basic questions, greetings, or things an LLM can answer directly.\n"
-            "- TOOL: Commands that require running exactly one specific tool (like weather, memory retrieval, open app).\n"
-            "- MULTI_STEP: Complex requests needing multiple steps or AgentNova.\n\n"
-            f"Command: '{text}'\n\n"
-            "Reply ONLY with the category name (e.g. SIMPLE), nothing else."
-        )
+        t = text.lower()
         
-        try:
-            result = generate_chat([{"role": "user", "content": prompt}], use_tools=False)
-            result = result.strip().upper()
+        # Deterministic Heuristics
+        multi_step_keywords = ["search", "find", "read", "summarize", "research", "look up", "navigate"]
+        if any(k in t for k in multi_step_keywords):
+            return CommandComplexity.MULTI_STEP
             
-            # Clean up the output in case the LLM includes extra text
-            for cat in [CommandComplexity.SIMPLE, CommandComplexity.TOOL, CommandComplexity.MULTI_STEP]:
-                if cat in result:
-                    return cat
-        except Exception as e:
-            logging.error(f"Brain intent classification failed: {e}")
+        tool_keywords = ["weather", "calculate", "math"]
+        if any(k in t for k in tool_keywords):
+            return CommandComplexity.TOOL
             
         return CommandComplexity.SIMPLE
 

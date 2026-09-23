@@ -112,6 +112,8 @@ class AgentNovaExecutor:
             log.info(f"Executing complex task via AgentNova: {text}")
         
         try:
+            from core.config import task_abort_event
+            task_abort_event.clear()
             with concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool:
                 # We submit the blocking run method to the pool
                 future = pool.submit(self.agent.run, text)

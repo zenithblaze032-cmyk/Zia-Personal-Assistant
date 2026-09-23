@@ -119,6 +119,10 @@ def _handle_vision(match: re.Match, ctx: Context) -> None:
         log.error(f"Vision failed: {e}")
         ctx.say("I couldn't analyze the screen, sir.")
 
+def _handle_abort(match: re.Match, ctx: Context) -> None:
+    from core.config import task_abort_event
+    task_abort_event.set()
+    ctx.say("Aborting the current task immediately, sir.")
 
 # ---------------------------------------------------------------------------
 # Registration
@@ -136,6 +140,7 @@ PATTERNS = [
     (r"\bwho are you\b|\bwhat are you\b|\bwhat(?:'s| is) your name\b|\bintroduce yourself\b|"
      r"\btell me about yourself\b|\byour capabilities\b|\bwhat can you do\b|\bwhat you can do\b|"
      r"\blist commands\b|\bcommands\b|\bhelp\b", _handle_intro),
+    (r"\babort task\b|\bstop task\b|\bstop what you are doing\b|\bcancel task\b", _handle_abort),
 ]
 
 

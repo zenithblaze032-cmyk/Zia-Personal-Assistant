@@ -16,6 +16,8 @@ def search_web(query: str) -> str:
     Use this when you need live information or don't know the answer.
     """
     try:
+        from core.config import task_abort_event
+        if task_abort_event.is_set(): return "Task aborted by user."
         results = DDGS().text(query, max_results=3)
         if not results:
             return "No results found."
@@ -101,6 +103,8 @@ def fetch_webpage(url: str) -> str:
         url: The full URL to fetch (e.g. "https://en.wikipedia.org/wiki/Quantum_mechanics")
     """
     try:
+        from core.config import task_abort_event
+        if task_abort_event.is_set(): return "Task aborted by user."
         from playwright.sync_api import sync_playwright
         
         with sync_playwright() as p:

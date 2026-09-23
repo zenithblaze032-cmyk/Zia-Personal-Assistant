@@ -99,20 +99,37 @@ def _dispatch(text: str) -> None:
         st.last_activity = time.monotonic()
     else:
         log.info("No skill matched. Routing via Brain.")
+        
+        # Extract NLP context for better reasoning
+        nlp_context = ""
+        try:
+            from core.nlp import extract_intent_entities, format_parsed_context
+            parsed = extract_intent_entities(text)
+            nlp_context = format_parsed_context(parsed)
+            if nlp_context:
+                text_with_context = text + nlp_context
+            else:
+                text_with_context = text
+        except Exception as e:
+            log.warning(f"NLP extraction failed: {e}")
+            text_with_context = text
+
         category = brain.route_complexity(text)
         log.info(f"Brain classified intent as: {category}")
         
         if category == CommandComplexity.SIMPLE:
             compressed = brain.compress_prompt(text)
+            if nlp_context:
+                compressed += nlp_context
             response = generate_chat(memory.get_context(current_query=compressed), use_tools=False)
             ctx.say(response)
         else:
             if getattr(ctx, 'executor', None):
-                response = ctx.executor.execute(text, ctx_memory=memory)
+                response = ctx.executor.execute(text_with_context, ctx_memory=memory)
                 ctx.say(response)
             else:
                 log.info("Executor not initialized (Phase 3 pending). Falling back to basic LLM.")
-                response = generate_chat(memory.get_context(current_query=text))
+                response = generate_chat(memory.get_context(current_query=text_with_context))
                 ctx.say(response)
         
         st.last_activity = time.monotonic()
