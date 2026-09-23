@@ -60,9 +60,10 @@ class Memory:
         system_prompt_copy = self.system_prompt.copy()
         
         # RAG Injection
-        if _ltm and current_query:
+        if _ltm:
             try:
-                results = _ltm.search(query=current_query, limit=3)
+                # Fetch recent memories directly, bypassing the strict SQL LIKE search
+                results = _ltm.search(limit=10)
                 if results:
                     rag_context = "\n".join(r.content for r in results)
                     system_prompt_copy["content"] += "\n\nRelevant Memories:\n" + rag_context
