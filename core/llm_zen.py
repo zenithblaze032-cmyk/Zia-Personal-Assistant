@@ -132,7 +132,8 @@ def call_gemini(messages, use_tools):
     if not genai:
         raise ImportError("google-generativeai package not installed")
     
-    model = genai.GenerativeModel('gemini-1.5-flash', tools=available_tools if use_tools else None)
+    # Let's try the safest string for Gemini
+    model = genai.GenerativeModel('gemini-flash-latest', tools=available_tools if use_tools else None)
     
     # Very basic message conversion for Gemini (can be improved)
     gemini_history = []
@@ -160,21 +161,12 @@ def generate_zen_chat(messages: List[Dict[str, Any]], use_tools: bool = True) ->
         
     providers = [
         {
-            "name": "Cerebras",
-            "func": call_openai_compatible,
-            "args": {
-                "base_url": "https://api.cerebras.ai/v1",
-                "api_key": os.environ.get("CEREBRAS_API_KEY"),
-                "model_name": "llama3.1-70b" # or 8b
-            }
-        },
-        {
             "name": "Groq",
             "func": call_openai_compatible,
             "args": {
                 "base_url": "https://api.groq.com/openai/v1",
                 "api_key": os.environ.get("GROQ_API_KEY"),
-                "model_name": "llama3-70b-8192"
+                "model_name": "openai/gpt-oss-120b"
             }
         },
         {
@@ -188,16 +180,7 @@ def generate_zen_chat(messages: List[Dict[str, Any]], use_tools: bool = True) ->
             "args": {
                 "base_url": "https://openrouter.ai/api/v1",
                 "api_key": os.environ.get("OPENROUTER_API_KEY"),
-                "model_name": "meta-llama/llama-3-70b-instruct"
-            }
-        },
-        {
-            "name": "Nvidia",
-            "func": call_openai_compatible,
-            "args": {
-                "base_url": "https://integrate.api.nvidia.com/v1",
-                "api_key": os.environ.get("NVIDIA_API_KEY"),
-                "model_name": "meta/llama3-70b-instruct"
+                "model_name": "meta-llama/llama-3.1-70b-instruct"
             }
         }
     ]

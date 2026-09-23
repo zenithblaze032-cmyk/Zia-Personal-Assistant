@@ -47,6 +47,8 @@ def write_file(path: str, content: str) -> str:
     try:
         with open(path, "w", encoding="utf-8") as f:
             f.write(content)
+        if os.name == 'nt':
+            os.startfile(path)
         return f"Successfully wrote to {path}"
     except Exception as e:
         return f"Error writing file: {e}"
@@ -57,6 +59,8 @@ def list_directory(path: str) -> str:
     """
     try:
         items = os.listdir(path)
+        if os.name == 'nt':
+            os.startfile(path)
         return "\n".join(items)
     except Exception as e:
         return f"Error listing directory: {e}"
@@ -208,6 +212,73 @@ def press_keys(keys: str) -> str:
     except Exception as e:
         return f"Failed to press keys: {e}"
 
+def click_on_screen(element_description: str) -> str:
+    """
+    Finds a UI element on the screen based on the description and clicks it using the mouse.
+    Args:
+        element_description: What to click on (e.g. 'Submit button', 'Search bar', 'X icon').
+    """
+    try:
+        import google.generativeai as genai
+        from PIL import Image
+        import tempfile
+
+        api_key = os.environ.get("GEMINI_API_KEY")
+        if not api_key or api_key == "mock":
+            return "Error: Valid GEMINI_API_KEY is not set."
+            
+        genai.configure(api_key=api_key)
+        
+        temp_dir = os.path.join(tempfile.gettempdir(), "zia_screenshots")
+        os.makedirs(temp_dir, exist_ok=True)
+        filepath = os.path.join(temp_dir, "vision_click.png")
+        
+        screenshot = pyautogui.screenshot()
+        screenshot.save(filepath)
+        
+        img = Image.open(filepath)
+        model = genai.GenerativeModel('gemini-flash-latest') 
+        
+        prompt = f"Return the bounding box for the '{element_description}'. Return only the bounding box in [ymin, xmin, ymax, xmax] format."
+        
+        response = model.generate_content([img, prompt])
+        text = response.text.strip()
+        
+        # Match array even if there are newlines between numbers
+        match = re.search(r'\[\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\]', text)
+        if not match:
+            return f"Failed to find element. Vision model returned: {text}"
+            
+        ymin, xmin, ymax, xmax = map(int, match.groups())
+        
+        screen_w, screen_h = pyautogui.size()
+        center_x_norm = (xmin + xmax) / 2
+        center_y_norm = (ymin + ymax) / 2
+        
+        click_x = int((center_x_norm / 1000) * screen_w)
+        click_y = int((center_y_norm / 1000) * screen_h)
+        
+        pyautogui.moveTo(click_x, click_y, duration=0.2)
+        pyautogui.click()
+        
+        return f"Clicked on {element_description} at coordinates ({click_x}, {click_y})."
+    except Exception as e:
+        return f"Error executing click_on_screen: {e}"
+
+def type_on_screen(element_description: str, text: str) -> str:
+    """
+    Finds a text field on the screen based on the description, clicks it, and types the text.
+    Args:
+        element_description: The text box to find (e.g. 'Search bar', 'Chat input').
+        text: The text to type into the box.
+    """
+    click_res = click_on_screen(element_description)
+    if "Error" in click_res or "Failed" in click_res:
+        return click_res
+        
+    pyautogui.write(text, interval=0.01)
+    return f"Typed '{text}' into {element_description}."
+
 # Expose available tools for ollama (SIMPLE chat model)
 available_tools = [
     search_web,
@@ -219,5 +290,7 @@ available_tools = [
     take_screenshot,
     minimize_window,
     maximize_window,
-    press_keys
+    press_keys,
+    click_on_screen,
+    type_on_screen
 ]

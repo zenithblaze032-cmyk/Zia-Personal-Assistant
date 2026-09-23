@@ -88,13 +88,17 @@ def _dispatch(text: str) -> None:
     if any(cmd in text for cmd in EXIT_PHRASES):
         _go_shutdown()
         return
-    if any(cmd in text for cmd in SLEEP_PHRASES):
-        _go_sleep()
+    if "switch" in text.lower().strip() or "toggle zen mode" in text.lower():
+        st.zen_mode = not st.zen_mode
+        log.info(f"Zen Mode toggled to: {st.zen_mode}")
+        ctx.say(Zia_ZEN_ON_PHRASE if st.zen_mode else Zia_ZEN_OFF_PHRASE)
+        st.last_activity = time.monotonic()
         return
-    if any(cmd in text for cmd in ZEN_PHRASES):
-        st.zen_mode = True
-        log.info("Zen Mode activated via voice command.")
-        ctx.say(Zia_ZEN_ON_PHRASE)
+    elif any(cmd in text for cmd in ZEN_PHRASES):
+        if not st.zen_mode:
+            st.zen_mode = True
+            log.info("Zen Mode activated via voice command.")
+            ctx.say(Zia_ZEN_ON_PHRASE)
         st.last_activity = time.monotonic()
         return
 
@@ -121,35 +125,32 @@ def _dispatch(text: str) -> None:
             log.warning(f"NLP extraction failed: {e}")
             text_with_context = text
 
-        category = brain.route_complexity(text)
-        log.info(f"Brain classified intent as: {category}")
-        
-        if category == CommandComplexity.SIMPLE:
-            compressed = brain.compress_prompt(text)
-            if nlp_context:
-                compressed += nlp_context
-            
-            if st.zen_mode:
-                from core.llm_zen import generate_zen_chat
-                response = generate_zen_chat(memory.get_context(current_query=compressed), use_tools=False)
-            else:
-                response = generate_chat(memory.get_context(current_query=compressed), use_tools=False)
+        if st.zen_mode:
+            log.info("Zen Mode: Bypassing brain classification for maximum speed.")
+            from core.llm_zen import generate_zen_chat
+            response = generate_zen_chat(memory.get_context(current_query=text_with_context), use_tools=True)
             ctx.say(response)
         else:
-            if st.zen_mode:
-                from core.llm_zen import generate_zen_chat
-                # Using text_with_context since it includes NLP info which can help the fast models
-                response = generate_zen_chat(memory.get_context(current_query=text_with_context), use_tools=True)
-                ctx.say(response)
-            elif getattr(ctx, 'executor', None):
-                # We DO NOT pass nlp_context to the executor because it confuses AgentNova's tool parser
-                response = ctx.executor.execute(text, ctx_memory=memory)
+            category = brain.route_complexity(text)
+            log.info(f"Brain classified intent as: {category}")
+            
+            if category == CommandComplexity.SIMPLE:
+                compressed = brain.compress_prompt(text)
+                if nlp_context:
+                    compressed += nlp_context
+                
+                response = generate_chat(memory.get_context(current_query=compressed), use_tools=False)
                 ctx.say(response)
             else:
-                log.info("Executor not initialized (Phase 3 pending). Falling back to basic LLM.")
-                # We pass the text_with_context here because it's a basic LLM generation without tools
-                response = generate_chat(memory.get_context(current_query=text_with_context))
-                ctx.say(response)
+                if getattr(ctx, 'executor', None):
+                    # We DO NOT pass nlp_context to the executor because it confuses AgentNova's tool parser
+                    response = ctx.executor.execute(text, ctx_memory=memory)
+                    ctx.say(response)
+                else:
+                    log.info("Executor not initialized (Phase 3 pending). Falling back to basic LLM.")
+                    # We pass the text_with_context here because it's a basic LLM generation without tools
+                    response = generate_chat(memory.get_context(current_query=text_with_context))
+                    ctx.say(response)
         
         st.last_activity = time.monotonic()
 

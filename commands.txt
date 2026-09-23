@@ -6,7 +6,7 @@ This file contains the complete list of commands, capabilities, and features bui
 -------------------------------------------------------------
 1. ZEN MODE (Lightning Speed & Cloud APIs)
 -------------------------------------------------------------
-Zen Mode forces Zia to use a cascading chain of lightning-fast cloud APIs (Cerebras -> Groq -> Gemini Flash -> OpenRouter -> Nvidia) rather than local models, prioritizing extreme speed and accuracy for complex tasks.
+Zen Mode forces Zia to use a cascading chain of lightning-fast cloud APIs (Groq -> Gemini Flash -> OpenRouter) rather than local models, prioritizing extreme speed and accuracy for complex tasks.
 • "Go zen"
 • "Start zen mode"
 • "Switch"
@@ -66,10 +66,20 @@ Zia can instantly set up your entire coding environment (opening VS Code, specif
 • "Play [query] on youtube" / "Find [query] on youtube" -> Opens YouTube and searches the query.
 
 -------------------------------------------------------------
-8. VISION & SCREENSHOTS
+-------------------------------------------------------------
+8. VISION & SCREENSHOTS & AUTONOMOUS COMPUTER USE
 -------------------------------------------------------------
 • "Take a screenshot" / "Grab a screenshot" -> Captures the screen and saves it to a temp folder.
 • "What is on my screen?" / "Analyze my screen" -> Takes a screenshot and passes it to the Moondream Vision LLM, answering questions about what you are currently looking at.
+• "Click on the Submit button" (Zia takes a screenshot, finds the bounding box via Gemini, and clicks it)
+• "Type 'hello' into the search bar" (Zia finds the search bar, clicks it, and types)
+
+-------------------------------------------------------------
+9. CONFIRMED MESSAGING (VOICE TEXTING)
+-------------------------------------------------------------
+• "Message Ayush saying I'll be late"
+• "Text Mom that I am coming home"
+  (Zia will open WhatsApp, find the chat, type the message, and ask "Should I send it?" before hitting Enter.)
 
 -------------------------------------------------------------
 9. MOUSE, KEYBOARD & AUTOMATION
