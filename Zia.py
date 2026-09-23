@@ -125,10 +125,12 @@ def _dispatch(text: str) -> None:
             ctx.say(response)
         else:
             if getattr(ctx, 'executor', None):
-                response = ctx.executor.execute(text_with_context, ctx_memory=memory)
+                # We DO NOT pass nlp_context to the executor because it confuses AgentNova's tool parser
+                response = ctx.executor.execute(text, ctx_memory=memory)
                 ctx.say(response)
             else:
                 log.info("Executor not initialized (Phase 3 pending). Falling back to basic LLM.")
+                # We pass the text_with_context here because it's a basic LLM generation without tools
                 response = generate_chat(memory.get_context(current_query=text_with_context))
                 ctx.say(response)
         

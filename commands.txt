@@ -10,6 +10,7 @@ SYSTEM CONTROLS
 - "What is on my screen?" / "Analyze my screen" (Uses Moondream Vision)
 - "Lock pc" / "Lock screen"
 - "Who are you?" / "Help" / "List commands"
+- "Abort task" / "Stop what you are doing" (Watchdog: Instantly cancels any stuck LLM process)
 
 MEDIA CONTROLS
 - "Play" / "Pause" / "Resume" (AgentNova)
@@ -48,8 +49,8 @@ CLIPBOARD & AUTOMATION
 
 MEMORY & PROACTIVE INTELLIGENCE
 - "Take a note that [note]" / "Remember [fact]" -> Saves explicitly to local vector database.
-- Ask questions about facts, e.g., "What is my favorite color?" -> Routes to LLM with injected RAG memory.
-- "Go to sleep" -> Enters standby mode. Silently triggers a background agent to read your recent conversation transcript and proactively consolidate facts and preferences into long-term RAG memory.
+- Ask questions about facts, e.g., "What is my favorite color?" -> Uses instant NLP Entity Extraction (spaCy) to grab exact subjects and route to LLM with injected RAG memory.
+- Memory works continuously; you do not need to say "go to sleep" to pull recent facts into context.
 
 COMPLEX TASKS (AgentNova)
 - "Delete the temp files" -> Executes shell commands (asks for confirmation first).

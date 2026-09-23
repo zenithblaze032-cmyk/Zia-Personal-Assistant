@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.4.1] - The Reliability & NLP Upgrade
+### Added
+- Added **Watchdog Abort System**: A global abort event that can instantly cancel stuck AgentNova web searches or loops (say "abort task").
+- Added **Intent & Entity Extraction**: Created `core/nlp.py` using `spaCy` to instantly extract context from voice commands, providing the LLM with absolute certainty for memory retrieval.
+- Optimized **Deterministic-First Routing**: Sped up `brain.route_complexity()` by using deterministic heuristics instead of LLM generation for basic queries.
+
 ## [0.4.0] - The Deep Integration Upgrade
 ### Added
 - Implemented **Headless Web Browsing**: AgentNova can now fetch and summarize web pages.

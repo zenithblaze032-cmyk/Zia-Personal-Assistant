@@ -11,8 +11,12 @@ class AgentNovaExecutor:
         if USE_AGENTNOVA:
             try:
                 import agentkthx
+                import agentkthx.core.helpers
                 from agentkthx import Tool, ToolParam, make_builtin_registry
                 from core.tools import fetch_webpage, take_screenshot, minimize_window, maximize_window, press_keys
+                
+                # Disable directory security restrictions so Zia can access any file on the system
+                agentkthx.core.helpers.ALLOWED_PATH_PATTERNS.update(["C:\\", "D:\\", "E:\\", "F:\\", "/"])
                 
                 fetch_webpage_tool = Tool(
                     name="fetch_webpage",
@@ -71,7 +75,8 @@ class AgentNovaExecutor:
                         "IMPORTANT: Always wrap file paths in quotes (e.g. \"C:\\path\\to\\file\") when using the shell tool.\n"
                         "IMPORTANT: When using the `shell` tool, the argument name MUST be 'command' (not 'body').\n"
                         "CRITICAL: For web searches or reading articles, you MUST use the `web-search` and `fetch_webpage` tools. NEVER use the `shell` tool to browse the internet.\n"
-                        "CRITICAL: When using a tool, you MUST output ONLY the exact tool call format required. Do NOT include any conversational text like 'I will now run...' before the tool call."
+                        "CRITICAL: When using a tool, you MUST output ONLY the exact tool call format required. It MUST be valid JSON with 'name' and 'arguments' keys. Example: {\"name\": \"write_file\", \"arguments\": {\"file_path\": \"...\", \"content\": \"...\"}}\n"
+                        "Do NOT use 'parameters' key, use 'arguments'. Do NOT include any conversational text like 'I will now run...' before the tool call."
                     )
                 )
             except ImportError:

@@ -6,8 +6,8 @@ A blazingly fast, hybrid AI-powered personal assistant built exclusively for Win
 
 - **Hybrid Architecture**: Fast and accurate voice recognition powered by Google Speech API, while keeping text-to-speech (Piper) and LLM reasoning (Llama 3.2 via Ollama) 100% local on your machine for maximum privacy and performance.
 - **AgentNova OS Integration**: Zia doesn't just talk; she acts. Powered by AgentKthx, she can minimize/maximize windows, control system volume, press hotkeys, manage files, and execute PowerShell commands.
-- **Headless Web Browsing**: Ask a question, and Zia will silently search the web, fetch the HTML, strip out the noise, and read you a concise summary of the page.
-- **Proactive Intelligence (Continuous Memory)**: Say *"Go to sleep"* and Zia spins up a background agent. It reads your recent conversation, extracts your habits, facts, and preferences, and permanently injects them into her local RAG vector database (EffGen). 
+- **Headless Web Browsing**: Ask a question, and Zia will silently search the web, fetch the HTML, strip out the noise, and read you a concise summary of the page. Includes a **Watchdog Abort System**—just say "Abort task" to instantly cancel any stuck web search.
+- **Continuous Memory & NLP**: Uses `spaCy` to instantly perform NLP Entity Extraction on your speech. This gives the LLM absolute certainty on the subjects you are talking about, allowing it to instantly recall facts (like your name or preferences) from the local SQLite database without manual sleep triggers. 
 - **Vision Capabilities**: Tell Zia to *"Analyze my screen"* and she uses Moondream Vision models to take a screenshot and tell you exactly what you're looking at.
 
 ## 🏗️ Architecture
@@ -15,9 +15,9 @@ A blazingly fast, hybrid AI-powered personal assistant built exclusively for Win
 Zia uses a sophisticated routing engine to ensure sub-second response times:
 1. **STT (Speech-to-Text)**: Google Speech API continually listens for the wake word with high accuracy and low latency.
 2. **The Router**: 
-   - *Regex Fast-Path*: Simple commands (e.g. "Take a screenshot", "Lock PC") bypass the LLM entirely and execute instantly.
-   - *EffGen RAG*: Personal questions query the local SQLite vector database and inject context into the prompt.
-   - *AgentNova Executor*: Complex multi-step requests (e.g. "Read the file on my desktop", "Search Wikipedia") are handed to the AgentKthx loop which iteratively uses OS tools to solve the goal.
+   - *Deterministic Fast-Path*: Simple commands (e.g., "Take a screenshot", "What's the weather") bypass the LLM entirely using keyword heuristics and execute instantly, doubling response speeds.
+   - *NLP RAG Context*: Personal questions trigger `spaCy` to extract entities, query the local database, and inject pinpoint context into the prompt.
+   - *AgentNova Executor*: Complex multi-step requests (e.g., "Search Wikipedia") are handed to the AgentKthx loop which iteratively uses OS tools to solve the goal (with Watchdog abort support).
 3. **TTS (Text-to-Speech)**: Responses are synthesized via local Piper TTS, with built-in audio echo cancellation so Zia doesn't trigger her own wake word while speaking.
 
 ## 🛠️ Installation & Setup
