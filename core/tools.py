@@ -94,33 +94,33 @@ def calculate(expression: str) -> str:
 
 def fetch_webpage(url: str) -> str:
     """
-    Fetches a webpage and extracts the raw readable text from the HTML.
+    Fetches a webpage and extracts the raw readable text from the HTML using a headless browser.
     Use this to read articles, documentation, or any text-based website.
     
     Args:
         url: The full URL to fetch (e.g. "https://en.wikipedia.org/wiki/Quantum_mechanics")
     """
     try:
-        headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-        }
-        response = requests.get(url, headers=headers, timeout=10)
-        response.raise_for_status()
+        from playwright.sync_api import sync_playwright
         
-        # Simple HTML stripping since BeautifulSoup is not guaranteed to be installed
-        html = response.text
-        
-        # Remove script and style elements
-        html = re.sub(r'<script.*?</script>', '', html, flags=re.DOTALL | re.IGNORECASE)
-        html = re.sub(r'<style.*?</style>', '', html, flags=re.DOTALL | re.IGNORECASE)
-        
-        # Remove HTML tags
-        text = re.sub(r'<[^>]+>', ' ', html)
-        
-        # Clean up whitespace
+        with sync_playwright() as p:
+            # Launch chromium in headless mode
+            browser = p.chromium.launch(headless=True)
+            page = browser.new_page(
+                user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+            )
+            
+            # Wait until the network is mostly idle to ensure JS has loaded
+            page.goto(url, wait_until='networkidle', timeout=15000)
+            
+            # Extract text specifically from the body
+            text = page.locator("body").inner_text()
+            
+            browser.close()
+            
+        # Clean up excessive whitespace
         lines = (line.strip() for line in text.splitlines())
-        chunks = (phrase.strip() for line in lines for phrase in line.split("  "))
-        text = '\n'.join(chunk for chunk in chunks if chunk)
+        text = '\n'.join(line for line in lines if line)
         
         # Return first 10,000 characters to prevent overwhelming the context window
         if len(text) > 10000:
@@ -128,6 +128,7 @@ def fetch_webpage(url: str) -> str:
             
         return text
     except Exception as e:
+        log.error(f"Failed to fetch webpage with Playwright: {e}")
         return f"Failed to fetch webpage: {e}"
 
 def take_screenshot() -> str:

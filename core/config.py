@@ -45,7 +45,10 @@ WAKE_WORD_ALIASES: tuple[str, ...] = tuple(
     a.strip().lower()
     for a in (os.environ.get("WAKE_WORD_ALIASES")
               or "zia,hey zia,hi zia,ok zia,jarvis,hey jarvis,hi jarvis,ok jarvis,jervis,jarves,"
-                 "arise,okiro,okiru,wake-up,wakeup,wake up zia,wake up jarvis").split(",")
+                 "arise,okiro,okiru,wake-up,wakeup,wake up zia,wake up jarvis,"
+                 "ziya,zeah,zea,c-ya,see ya,see-ya,tsia,xea,zee ah,ziaa,ziaah,"
+                 "sia,siya,seah,sea,see-ah,see ah,seea,siaa,"
+                 "jia,jiya,jeah,jea,jee-ah,jee ah,jeea,jiaa").split(",")
     if a.strip()
 )
 WAKE_WORD_FUZZY_THRESHOLD = _env_float("WAKE_WORD_FUZZY_THRESHOLD", 0.78)
@@ -114,5 +117,5 @@ USE_AGENTNOVA = (os.environ.get("USE_AGENTNOVA") or "True").strip().lower() in (
 # Disabled by default since OllamaClient does not support STT
 USE_AGENTSDK_STT = (os.environ.get("USE_AGENTSDK_STT") or "False").strip().lower() in ("true", "1", "yes")
 AGENTNOVA_CONFIRM_DANGEROUS = (os.environ.get("AGENTNOVA_CONFIRM_DANGEROUS") or "True").strip().lower() in ("true", "1", "yes")
-AGENTNOVA_TIMEOUT_SEC = int(_env_float("AGENTNOVA_TIMEOUT_SEC", 30))
+AGENTNOVA_TIMEOUT_SEC = int(_env_float("AGENTNOVA_TIMEOUT_SEC", 120))
 EFFGEN_COMPRESS_PROMPTS = (os.environ.get("EFFGEN_COMPRESS_PROMPTS") or "True").strip().lower() in ("true", "1", "yes")

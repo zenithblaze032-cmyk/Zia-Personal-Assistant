@@ -4,7 +4,7 @@ color 0A
 cls
 echo.
 echo  ============================================================
-echo    J A R V I S  -  Voice-Activated Workspace Launcher
+echo    Z I A  -  Voice-Activated Workspace Assistant
 echo  ============================================================
 echo.
 echo  Say "wake up" to launch your assistant:

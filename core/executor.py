@@ -120,7 +120,13 @@ class AgentNovaExecutor:
                     # Safely handle AgentRun objects to prevent raw string dumps to TTS
                     if type(result).__name__ == "AgentRun":
                         if getattr(result, "final_answer", None):
-                            return str(result.final_answer)
+                            ans = str(result.final_answer)
+                            # Sanitize raw JSON blocks if the LLM hallucinates a tool call into the final answer
+                            import re
+                            clean_ans = re.sub(r'\{[^{]*"name"\s*:\s*".*?\}.*', '', ans, flags=re.DOTALL).strip()
+                            if not clean_ans:
+                                return "I attempted the task, but my systems encountered a tool parsing error."
+                            return clean_ans
                         elif getattr(result, "success", True) is False:
                             return "I attempted the task, but I encountered a tool execution error and could not complete it."
                         else:

@@ -10,7 +10,7 @@ graphify-out/
 *.onnx.json
 *.zip
 docs/IMPROVEMENTS.md
-
+Upgrade/
 # --- Memory data (never commit personal memory stores) ---
 memory.txt
 memory.db
