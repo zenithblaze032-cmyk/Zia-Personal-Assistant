@@ -63,6 +63,9 @@ tts_active = threading.Event()
 interrupt_event = threading.Event()
 task_abort_event = threading.Event()
 
+# Zen Mode phrases
+ZEN_PHRASES = ["go zen", "start zen mode", "switch", "initialize zen mode", "go to zen mode", "activate zen mode"]
+
 # Distinct phrases that will interrupt Zia when she is speaking
 INTERRUPT_PHRASES = [
     "ok zia", 
@@ -105,6 +108,12 @@ Zia_EXIT_PHRASE = (os.environ.get("Zia_EXIT_PHRASE")
                    or "Shutting down. Goodbye, sir.").strip()
 Zia_WELCOME_ENABLED = (os.environ.get("Zia_WELCOME_ENABLED")
                        or "False").strip().lower() in ("true", "1", "yes")
+
+Zia_ZEN_ON_PHRASE = (os.environ.get("Zia_ZEN_ON_PHRASE")
+                     or "Zen Mode initialized. Lightning speed engaged.").strip()
+Zia_ZEN_OFF_PHRASE = (os.environ.get("Zia_ZEN_OFF_PHRASE")
+                      or "Falling back to normal mode, as our zen limits are reached.").strip()
+
 Zia_SPEAK_DELAY_S = _env_float("Zia_SPEAK_DELAY_S", 1.0)
 Zia_TTS_VOICE = (os.environ.get("Zia_TTS_VOICE") or "en-GB-RyanNeural").strip()
 Zia_PIPER_VOICE = (os.environ.get("Zia_PIPER_VOICE")

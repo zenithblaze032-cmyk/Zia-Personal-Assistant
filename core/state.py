@@ -11,5 +11,6 @@ class State:
         self.state = AssistantState.ASLEEP
         self.last_activity = time.monotonic()
         self.post_wake_until = 0.0
+        self.zen_mode = False
 
 st = State()

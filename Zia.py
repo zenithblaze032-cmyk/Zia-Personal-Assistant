@@ -59,6 +59,7 @@ ctx = Context(say_fn=say_text, sleep_fn=_go_sleep, shutdown_fn=_go_shutdown, mem
 EXIT_PHRASES = ["exit Zia", "quit Zia", "shut down Zia", "shutdown Zia",
                 "close Zia", "shut down", "shutdown"]
 SLEEP_PHRASES = ["go to sleep", "sleep Zia", "Zia sleep", "standby", "sleep"]
+from core.config import ZEN_PHRASES, Zia_ZEN_ON_PHRASE
 
 
 def _wake_word_hit(text: str) -> bool:
@@ -89,6 +90,12 @@ def _dispatch(text: str) -> None:
         return
     if any(cmd in text for cmd in SLEEP_PHRASES):
         _go_sleep()
+        return
+    if any(cmd in text for cmd in ZEN_PHRASES):
+        st.zen_mode = True
+        log.info("Zen Mode activated via voice command.")
+        ctx.say(Zia_ZEN_ON_PHRASE)
+        st.last_activity = time.monotonic()
         return
 
     # Add user message to memory
@@ -121,10 +128,20 @@ def _dispatch(text: str) -> None:
             compressed = brain.compress_prompt(text)
             if nlp_context:
                 compressed += nlp_context
-            response = generate_chat(memory.get_context(current_query=compressed), use_tools=False)
+            
+            if st.zen_mode:
+                from core.llm_zen import generate_zen_chat
+                response = generate_zen_chat(memory.get_context(current_query=compressed), use_tools=False)
+            else:
+                response = generate_chat(memory.get_context(current_query=compressed), use_tools=False)
             ctx.say(response)
         else:
-            if getattr(ctx, 'executor', None):
+            if st.zen_mode:
+                from core.llm_zen import generate_zen_chat
+                # Using text_with_context since it includes NLP info which can help the fast models
+                response = generate_zen_chat(memory.get_context(current_query=text_with_context), use_tools=True)
+                ctx.say(response)
+            elif getattr(ctx, 'executor', None):
                 # We DO NOT pass nlp_context to the executor because it confuses AgentNova's tool parser
                 response = ctx.executor.execute(text, ctx_memory=memory)
                 ctx.say(response)

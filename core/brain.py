@@ -49,7 +49,13 @@ class Brain:
         )
         
         try:
-            result = generate_chat([{"role": "user", "content": prompt}], use_tools=False)
+            from core.state import st
+            if st.zen_mode:
+                from core.llm_zen import generate_zen_chat
+                result = generate_zen_chat([{"role": "user", "content": prompt}], use_tools=False)
+            else:
+                result = generate_chat([{"role": "user", "content": prompt}], use_tools=False)
+                
             result = result.strip().upper()
             
             for cat in [CommandComplexity.SIMPLE, CommandComplexity.TOOL, CommandComplexity.MULTI_STEP]:
