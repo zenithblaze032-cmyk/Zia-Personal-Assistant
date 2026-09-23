@@ -77,9 +77,11 @@ Zia can instantly set up your entire coding environment (opening VS Code, specif
 -------------------------------------------------------------
 9. CONFIRMED MESSAGING (VOICE TEXTING)
 -------------------------------------------------------------
-• "Message Ayush saying I'll be late"
-• "Text Mom that I am coming home"
-  (Zia will open WhatsApp, find the chat, type the message, and ask "Should I send it?" before hitting Enter.)
+• "Message Ayush saying I'll be late on WhatsApp"
+• "Text Mom that I am coming home on Telegram"
+• "Text Alex I will call you later on Instagram"
+• "Send Sam hello on Discord"
+  (Zia opens the selected web app, finds the chat, types the message, and asks "Should I send it?" before hitting Enter.)
 
 -------------------------------------------------------------
 9. MOUSE, KEYBOARD & AUTOMATION

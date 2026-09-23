@@ -5,15 +5,16 @@ import google.generativeai as genai
 
 load_dotenv()
 
+
 def print_models(name, base_url, api_key):
     print(f"\n--- {name} Models ---")
     if not api_key or api_key == "mock":
         print("Missing API key.")
         return
-        
+
     url = f"{base_url}/models"
     headers = {"Authorization": f"Bearer {api_key}"}
-    
+
     try:
         response = requests.get(url, headers=headers)
         if response.status_code == 200:
@@ -22,9 +23,11 @@ def print_models(name, base_url, api_key):
             for m in models:
                 print(m.get("id", "Unknown"))
         else:
-            print(f"Failed to fetch models: {response.status_code} - {response.text}")
+            print(
+                f"Failed to fetch models: {response.status_code} - {response.text}")
     except Exception as e:
         print(f"Error: {e}")
+
 
 def print_gemini_models():
     print(f"\n--- Gemini Models ---")
@@ -32,7 +35,7 @@ def print_gemini_models():
     if not api_key or api_key == "mock":
         print("Missing API key.")
         return
-        
+
     genai.configure(api_key=api_key)
     try:
         models = genai.list_models()
@@ -42,7 +45,7 @@ def print_gemini_models():
     except Exception as e:
         print(f"Error: {e}")
 
-print_models("Cerebras", "https://api.cerebras.ai/v1", os.environ.get("CEREBRAS_API_KEY"))
-print_models("Groq", "https://api.groq.com/openai/v1", os.environ.get("GROQ_API_KEY"))
-print_models("Nvidia", "https://integrate.api.nvidia.com/v1", os.environ.get("NVIDIA_API_KEY"))
+
+print_models("Groq", "https://api.groq.com/openai/v1",
+             os.environ.get("GROQ_API_KEY"))
 print_gemini_models()

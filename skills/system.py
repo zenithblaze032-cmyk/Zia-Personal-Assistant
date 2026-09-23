@@ -102,27 +102,37 @@ def _handle_intro(match: re.Match, ctx: Context) -> None:
         "How may I be of service?"
     )
 
+
 def _handle_vision(match: re.Match, ctx: Context) -> None:
     ctx.say("Let me take a look...")
     try:
         from core.vision import capture_screen_bytes
-        from core.llm import generate_vision_chat
-        
+        from core.state import st
+
+        if st.zen_mode:
+            from core.llm_zen import generate_zen_vision
+            vision_chat = generate_zen_vision
+        else:
+            from core.llm import generate_vision_chat
+            vision_chat = generate_vision_chat
+
         query = "Describe what is on the screen briefly."
         if match and "query" in match.groupdict() and match.group("query"):
             query = match.group("query").strip()
-            
+
         img_bytes = capture_screen_bytes()
-        response = generate_vision_chat(query, img_bytes)
+        response = vision_chat(query, img_bytes)
         ctx.say(response)
     except Exception as e:
         log.error(f"Vision failed: {e}")
         ctx.say("I couldn't analyze the screen, sir.")
 
+
 def _handle_abort(match: re.Match, ctx: Context) -> None:
     from core.config import task_abort_event
     task_abort_event.set()
     ctx.say("Aborting the current task immediately, sir.")
+
 
 # ---------------------------------------------------------------------------
 # Registration
