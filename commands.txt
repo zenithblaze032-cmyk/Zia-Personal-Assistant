@@ -1,99 +1,349 @@
 =============================================================
              ZIA ASSISTANT - COMPREHENSIVE COMMAND GUIDE
 =============================================================
-This file contains the complete list of commands, capabilities, and features built into Zia.
+This file lists every voice command implemented in Zia.py + skills/*
++ core/tools.py + core/executor.py (AgentNova).
+
+Notes:
+- Wake-word gated. Default WAKE_WORD is "wake up" with aliases below.
+  Say wake word first when ASLEEP, then your command. Inline works:
+  "wake up Zia, what time is it".
+- After waking, Zia stays AWAKE until IDLE_TIMEOUT_S (default 90s),
+  then auto-sleeps. Say "go to sleep" to force sleep.
+- Priority (first match wins): workspace > routines > web > system >
+  media > apps > notes > weather > timers > clipboard >
+  window_manager > automation. Unmatched -> Brain -> SIMPLE (LLM
+  answer) or TOOL/MULTI_STEP (AgentNova).
+- Say "abort task" to cancel stuck web search / fetch / AgentNova.
 
 -------------------------------------------------------------
-1. HYBRID ARCHITECTURE (Automatic Cloud & Local)
+1. WAKE / SLEEP / EXIT / INTERRUPT (core/config.py + Zia.py)
 -------------------------------------------------------------
-Zia automatically uses a cascading chain of lightning-fast cloud APIs (Groq -> Gemini Flash -> OpenRouter). If all APIs fail or you lose internet connection, she will automatically fall back to local LLMs. There are no manual switches needed.
+WAKE_WORD (default): "wake up"
+WAKE_WORD_ALIASES: zia, hey zia, hi zia, ok zia, jarvis, hey jarvis,
+  hi jarvis, ok jarvis, jervis, jarves, arise, okiro, okiru, wake-up,
+  wakeup, wake up zia, wake up jarvis, ziya, zeah, zea, c-ya, see ya,
+  see-ya, tsia, xea, zee ah, ziaa, ziaah, sia, siya, seah, sea, see-ah,
+  see ah, seea, siaa, jia, jiya, jeah, jea, jee-ah, jee ah, jeea, jiaa
+
+  * "Zia" / "hey Zia" / "wake up" -> wakes ASLEEP -> AWAKE.
+    She says Zia_WAKE_PHRASE ("Welcome back sir, how can I help you?").
+  * Inline: "wake up Zia, open notepad" -> wakes + runs remainder.
+
+SLEEP_PHRASES (substring match):
+  * "go to sleep" / "sleep Zia" / "Zia sleep" / "standby" / "sleep"
+    -> standby ASLEEP + memory consolidation.
+
+EXIT_PHRASES (substring match, os._exit(0)):
+  * "exit Zia" / "quit Zia" / "shut down Zia" / "shutdown Zia" /
+    "close Zia" / "shut down" / "shutdown"
+
+BARGE-IN WHILE SPEAKING (core/asr.py INTERRUPT_PHRASES):
+  * "shut up" / "stop talking" / "quiet" / "abort" / "cancel" / "enough"
+    -> interrupts TTS at once. If text also has "sleep", goes to sleep.
+
+ABORT BACKGROUND TASK (skills/system.py, task_abort_event):
+  * "abort task" / "stop task" / "stop what you are doing" / "cancel task"
+    -> cancels DDGS search, Playwright fetch, AgentNova loop.
 
 -------------------------------------------------------------
-2. CORE SYSTEM & ASSISTANT CONTROL
+2. HELP / INTRO (skills/system.py _handle_intro)
 -------------------------------------------------------------
-• "Shut down Zia" / "Exit Zia" / "Quit Zia" -> Shuts down the assistant entirely.
-• "Go to sleep" / "Sleep Zia" -> Puts Zia into standby mode (waiting for wake word).
-• "Wake up" / "Wake up Zia" -> Awakens Zia from sleep.
-• "Abort task" / "Stop what you are doing" / "Cancel task" -> Instantly cancels any stuck process or background task.
-• "Who are you" / "What can you do" / "List commands" / "Help" -> Zia introduces herself and capabilities.
+Triggers: who are you | what are you | what's your name |
+  introduce yourself | tell me about yourself | your capabilities |
+  what can you do | what you can do | list commands | commands | help
+  * "Who are you" / "What can you do" / "List commands" / "Help"
+    -> intro + capability summary.
 
 -------------------------------------------------------------
-3. DATE, TIME, & WEATHER
+3. DATE & TIME (skills/system.py)
 -------------------------------------------------------------
-• "What's the time" / "What time is it" / "Time" -> Tells the current local time.
-• "What's the date" / "What day is it" / "Date" -> Tells the current date.
-• "What is the weather" / "Weather today" -> Fetches and reads current weather.
+  * Time: "what's the time" / "what is the time" / "what time is it" /
+    "the time" / "time"  e.g. "what time is it"
+  * Date: "what's the date" / "what is the date" / "what day is it" /
+    "what's today" / "what is today" / "date"  e.g. "what day is it"
 
 -------------------------------------------------------------
-4. WORKSPACES & ROUTINES
+4. VOLUME (skills/system.py, Windows keybd_event)
 -------------------------------------------------------------
-• "Start DSA work" / "Open data structures" -> Sets up Leetcode and coding workspace.
-• "Start development" / "Open web dev" -> Sets up general development environment.
-• "Start Zia work" / "Open Zia" -> Opens the Zia project directory and environments.
-• "Start hackathon work" -> Sets up a rapid-prototyping workspace.
+  * Up: "volume up" / "turn it up" / "louder" / "increase volume" /
+    "increase the volume" (5x VK_VOLUME_UP)
+  * Down: "volume down" / "turn it down" / "quieter" /
+    "decrease volume" / "decrease the volume" / "lower volume" /
+    "lower the volume"
+  * Mute: "mute" / "silence" / "shut up" (VK_VOLUME_MUTE)
 
 -------------------------------------------------------------
-5. APP & WINDOW MANAGEMENT
+5. MEDIA KEYS (skills/media.py, global media keys)
 -------------------------------------------------------------
-• "Open [app name]" / "Launch [app]" -> Opens any installed application.
-• "Close [app name]" / "Quit [app]" -> Force closes an application.
-• "Snap [app] to the left" -> Snaps window to the left half.
-• "Snap [app] to the right" -> Snaps window to the right half.
-• "Maximize [app]" -> Maximizes and focuses the window.
+Works in Spotify, Chrome, VLC, etc.
+  * "play" / "pause" / "resume" (+ music/song/track/video/playback)
+  * "next" / "skip" / "next track" / "skip song" / "skip it"
+  * "previous" / "last" / "go back" (+ track/song/video)
+  * "stop" / "stop music" / "stop the music" / "stop playback"
 
 -------------------------------------------------------------
-6. MEDIA & AUDIO CONTROLS
+6. APP & WEBSITE LAUNCHER (skills/apps.py)
 -------------------------------------------------------------
-• "Volume up" / "Louder" -> Increases system volume.
-• "Volume down" / "Quieter" -> Decreases system volume.
-• "Mute" / "Silence" / "Shut up" -> Mutes the system volume.
-• "Play" / "Pause" / "Resume" -> Controls media playback.
-• "Next" / "Skip" -> Skips track.
-• "Previous" / "Go back" -> Previous track.
-• "Stop" -> Stops media playback.
+Pattern: [can you|please|hey|go ahead and] + open|launch|start|run
+  [up] + [the|a|an] + <target>
+  e.g. "open notepad", "launch chrome", "please open youtube",
+  "can you open spotify", "start calculator", "run file explorer"
+
+Chain: phonetic-alias normalize -> exact site -> exact app ->
+  substring site/app -> fuzzy difflib (60pct) -> bare domain
+  (foo.com) -> Windows `start` fallback + Start-menu type+Enter.
+
+APPS: notepad, calculator/calc, paint, cmd/command prompt,
+  terminal/windows terminal, file explorer/explorer, task manager,
+  control panel, chrome/google chrome, edge/microsoft edge, firefox,
+  brave, spotify, vs code/vscode/visual studio code, word, excel,
+  powerpoint, teams, discord, slack, steam, obs.
+  Any other Windows App-Paths name also works via fallback.
+
+SITES: youtube, google, gmail, github, whatsapp (web.whatsapp.com),
+  maps/google maps, stack overflow, reddit, chatgpt, netflix,
+  leetcode (problemset), twitter/x, instagram, linkedin.
+
+Phonetic fixes: "you tube/utube/u tube"->youtube,
+  "note pad/notpad"->notepad, "calc later"->calculator,
+  "crome/chome"->chrome, "spotif y"->spotify, "git hub"->github.
+
+  * "Open [app/site]" -> opens app or site.
+  * "open example.com" -> opens https://example.com.
 
 -------------------------------------------------------------
-7. WEB SEARCH & BROWSING
+7. WINDOW MANAGEMENT (skills/window_manager.py, pygetwindow)
 -------------------------------------------------------------
-• "Google [query]" / "Search google for [query]" -> Opens browser and searches Google.
-• "Play [query] on youtube" / "Find [query] on youtube" -> Opens YouTube and plays the exact video.
-• "Search Wikipedia for [query] and summarize" -> Silently fetches HTML and reads summary.
+Fuzzy title match; restores minimized windows first.
+  * "Snap [app] to the left"  e.g. "snap chrome to the left"
+  * "Snap [app] to the right" e.g. "snap notepad to the right"
+  * "Maximize [app]"  e.g. "maximize chrome"
+  * "Close [app]" / "Quit [app]" / "Exit [app]"
+    e.g. "close notepad", "quit spotify", "exit chrome"
 
 -------------------------------------------------------------
-8. VISION, SCREENSHOTS & AUTONOMY
+8. WEB SEARCH & YOUTUBE (skills/web.py)
 -------------------------------------------------------------
-• "Take a screenshot" / "Grab a screenshot" -> Captures and saves the screen.
-• "What is on my screen?" / "Analyze my screen" -> Takes a screenshot and passes it to the Vision LLM to answer what you are looking at.
-• "Click on [element]" -> Zia takes a screenshot, finds the bounding box via vision grounding, and clicks it.
-• "Type [text] into [element]" -> Zia finds the element, clicks it, and types the text.
+  * Google: "google [query]" / "open a google search for [query]" /
+    "search google for [query]" / "open google and search for [query]"
+    e.g. "google quantum computing"
+    -> opens google.com/search?q=<query>.
+  * YouTube: "play [query] on youtube" / "find [query] on youtube"
+    e.g. "play lofi hip hop on youtube"
+    -> opens first video watch?v= link (autoplay), else search page.
 
 -------------------------------------------------------------
-9. MOUSE & KEYBOARD
+9. SCREENSHOT & SCREEN ANALYSIS (skills/system.py + core/vision.py)
 -------------------------------------------------------------
-• "Move mouse up/down/left/right by [amount]" -> Moves cursor.
-• "Click" / "Double click" / "Right click" -> Mouse clicks.
-• "Press [key]" -> Presses specific keys (Enter, Esc, Space, etc).
-• "Type [text]" -> Types the dictated text.
-• "Write an essay/paragraph about [topic]" -> Zia generates content using the LLM and types it automatically.
+-------------------------------------------------------------
+10. VISION CLICK & TYPE ON SCREEN (skills/automation.py + core/screen.py)
+-------------------------------------------------------------
+Vision-first patterns win over blind click/type. Needs grounding
+model (cloud-backed; clear error without GEMINI_API_KEY). DPI-aware.
+  * Click: "click [element]" / "click on [element]" /
+    "click onto [element]" / "tap [element]" (+ please/the/my)
+    e.g. "click on the Submit button", "click the search bar",
+    "tap the X icon"
+    -> grounds box [ymin,xmin,ymax,xmax], clicks center.
+  * Type into: "type [text] in/into/inside/on [element]" /
+    "write [text] in/into [element]" / "enter [text] into [element]" /
+    "put [text] into [element]"
+    e.g. "type hello into the search bar",
+    "enter admin into the username field"
+    -> clicks element, types text.
+  * Focus search: "go to [the|my] search [bar|box|field]" /
+    "focus [on] search [bar]" / "move to search" / "get to search"
+    e.g. "go to the search bar" -> clicks search field, says ready.
 
 -------------------------------------------------------------
-10. CLIPBOARD & NOTES
+11. MOUSE & KEYBOARD DIRECT (skills/automation.py, pyautogui)
 -------------------------------------------------------------
-• "Read my clipboard" -> Reads copied text.
-• "Save my clipboard" -> Saves copied text into memory.
-• "Take a note that [note]" / "Remember [fact]" -> Saves fact to vector DB.
+  * Move: "move mouse up/down/left/right [by N]" / "mouse up/down/left/right"
+    e.g. "move mouse right by 200" (default 100px, FAILSAFE=False)
+  * Blind clicks at cursor: "click" / "double click" / "right click"
+  * Press: "press [key]" / "hit [key]" where key =
+    enter/return, escape/esc, space, tab, backspace, delete,
+    up/down/left/right. e.g. "press enter", "hit escape"
+  * Dictate: "type [text]" / "write [text]" e.g. "type hello world"
+    -> paste via clipboard (pyperclip + ctrl+v).
+    Note: "type X into Y" routes to vision-type (Sec.10) instead.
 
 -------------------------------------------------------------
-11. TIMERS
+12. AI GENERATE & TYPE (skills/automation.py + core/llm.py)
 -------------------------------------------------------------
-• "Set a timer for [X] hours [Y] minutes [Z] seconds" -> Starts background countdown.
+Pattern: generate and type | draft and type |
+  write a[n] email|file|letter|paragraph|essay|story|script|code|
+  message|poem about | write about + <topic>
+  * "Write an essay about [topic]" / "Write a paragraph about [topic]" /
+    "Write an email about [topic]" / "Write a story/script/code about X" /
+    "Generate and type [topic]" / "Draft and type [topic]"
+    e.g. "write an essay about photosynthesis"
+    -> says "Drafting that for you now", LLM writes it, pastes at cursor.
 
 -------------------------------------------------------------
-12. MEMORY & NLP RAG
+13. CLIPBOARD (skills/clipboard.py, pyperclip)
 -------------------------------------------------------------
-• *Implicit Memory*: You can ask "What is my favorite color?" or "What was that command?". Zia uses NLP Entity Extraction to grab exact subjects and pull context from the local RAG vector database.
+  * "Read my clipboard" -> speaks text (200-char cap + "...").
+  * "Save my clipboard" / "Save my clipboard to notes"
+    -> appends "[timestamp] Clipboard: <text>" to local.txt.
+
+  * "Take a screenshot" / "Grab a screenshot" / "Grab the screenshot"
+    -> ~/Pictures/Zia/Zia_YYYYMMDD_HHMMSS.png (Pillow ImageGrab).
+       AgentNova `take_screenshot` tool variant -> %TEMP%/zia_screenshots/.
+  * "what is on my screen" / "read my screen" / "analyze my screen" /
+    "what am i looking at" + optional question
+    e.g. "what is on my screen?", "read my screen and summarize this error"
+    -> screenshots + vision LLM (Moondream/Gemini) speaks description.
 
 -------------------------------------------------------------
-13. AGENTNOVA (COMPLEX OS AUTONOMY)
+14. NOTES & MEMORY (skills/notes.py + core/memory.py + core/nlp.py)
 -------------------------------------------------------------
-If a command does not match any regex phrases, Zia's Brain classifies it. If complex, AgentNova iteratively uses OS tools to solve the goal.
+  * Take note: "take a note that [note]" / "remind me to [note]" /
+    "note down [note]" / "remember that [note]" / "remember [note]"
+    e.g. "take a note that meeting at 5pm",
+    "remember my favorite color is blue", "remind me to call mom"
+    -> long-term vector memory (SQLite + embeddings). Says "Note saved."
+  * Implicit recall (no regex, NLP RAG in Zia.py):
+    "What is my favorite color?" / "What is my dog's name?" /
+    "What was that command?"
+    -> spaCy entities -> vector DB -> injected context -> LLM answers.
+    Short-term = last 5 turns; auto-consolidated on sleep.
+
+-------------------------------------------------------------
+15. TIMERS (skills/timers.py, threading.Timer)
+-------------------------------------------------------------
+Pattern: set a timer for [N hours] [N minutes] [N seconds]
+  * "Set a timer for [X hours] [Y minutes] [Z seconds]"
+    e.g. "set a timer for 5 minutes", "set a timer for 10 seconds",
+    "set a timer for 1 hour 30 minutes"
+    -> background thread; expiry: "Sir, your timer for N seconds is up."
+
+-------------------------------------------------------------
+16. WEATHER (skills/weather.py, ip-api + open-meteo)
+-------------------------------------------------------------
+Regex: what is the weather | weather today | how is the weather |
+  what's the weather. Fuzzy intents (>=0.70 sim): "what is the weather
+  like right now", "tell me the current weather",
+  "is it going to rain today", "do I need an umbrella today",
+  "how hot is it outside".
+  * "What is the weather" / "Weather today" / fuzzy variants above
+    -> IP geolocation -> open-meteo current temp ->
+    "The current temperature in <City> is <temp> degrees."
+
+-------------------------------------------------------------
+17. CODING ROUTINES (skills/routines.py, auto window snap)
+-------------------------------------------------------------
+Each opens tabs + VS Code, snaps halves (3s launch delay).
+  * DSA: "start DSA" / "open DSA" / "start data structures" /
+    "open data structure(s)" e.g. "start DSA work"
+    -> "Ready for DSA, sir." YouTube DSA playlist + leetcode
+    problemset + VS Code D:\Programming\DSA\Code. VS Code left,
+    LeetCode/YouTube right.
+  * Web-dev: "start development" / "open development" /
+    "start web dev" / "open web dev" e.g. "start development"
+    -> "Web dev mode engaged." JS playlist + w3schools JS +
+    VS Code D:\Programming\WebDevelopment\JavaScript.
+  * Zia/Jarvis: "start Jarvis work" / "start Zia work" /
+    "open Jarvis work" / "open Zia work" e.g. "start Zia work"
+    -> VS Code D:\Development\Zia + Antigravity same path.
+  * Hackathon: "start hackathon" / "open hackathon"
+    -> VS Code + Antigravity D:\Development\Hackathon Projects.
+
+-------------------------------------------------------------
+18. VOICE WORKSPACE "GET BACK TO..." (skills/workspace.py)
+-------------------------------------------------------------
+One-shot guarded (state flags); tiled 3-col LeetCode|YouTube|VS Code
+when TILED_LAYOUT_ENABLED on Win32.
+  * "...get back to DSA work..." e.g. "let's get back to DSA work"
+    -> run_workspace_launch(mode="dsa"). Repeat: "already open, sir."
+  * "...get back to development work..." -> mode="dev".
+  * "...get back to improve you..." -> mode="Zia" (self-improve WS).
+
+-------------------------------------------------------------
+19. SCREEN LOCK (skills/system.py)
+-------------------------------------------------------------
+Pattern: lock + pc|screen|computer|workstation | lock it
+  * "Lock my PC" / "Lock the screen" / "Lock computer" / "Lock it"
+    -> Windows LockWorkStation(). Else: "only supported on Windows."
+
+-------------------------------------------------------------
+20. HYBRID ARCHITECTURE (core/llm.py, automatic, no switch)
+-------------------------------------------------------------
+Cloud cascade Groq -> Gemini Flash -> OpenRouter; offline fallback
+to local Ollama llama3.2. Vision via Moondream local / Gemini cloud.
+STT Google Speech API (optional Ollama STT if USE_AGENTSDK_STT=True).
+TTS local Piper (en_GB-alan-medium) + en-GB-RyanNeural, echo-cancelled
+(mute_mic + tts_active) so Zia ignores herself. EffGen PromptOptimizer
+compresses SIMPLE prompts when USE_EFFGEN=True.
+
+-------------------------------------------------------------
+21. BRAIN ROUTER (core/brain.py: SIMPLE vs TOOL vs MULTI_STEP)
+-------------------------------------------------------------
+Heuristics: MULTI_STEP = search|find|read|summarize|research|look up|
+  navigate. TOOL = weather|calculate|math. Else LLM classifies.
+  * SIMPLE: greetings, facts, memory recall -> generate_chat (5-turn
+    ctx + NLP entities), spoken directly.
+    e.g. "hello", "who is Alan Turing?", "what is my favorite color?"
+  * TOOL/MULTI_STEP -> AgentNova executor (Sec.22) with convo memory.
+  * Dangerous confirm (AGENTNOVA_CONFIRM_DANGEROUS=True): text with
+    delete|remove|rm |format |kill -> "That sounds dangerous... say
+    'proceed'..." Say "proceed/yes" to run, "cancel/no/stop/abort"
+    to cancel ("Operation cancelled.").
+
+-------------------------------------------------------------
+22. AGENTNOVA COMPLEX AUTONOMY (core/executor.py + core/tools.py)
+-------------------------------------------------------------
+Unmatched speech with TOOL/MULTI_STEP goes here. agentkthx loop with
+tools until done or AGENTNOVA_TIMEOUT_SEC (120s). Full FS
+(C:\ D:\ E:\ F:\ /). Speak naturally, no rigid syntax.
+Builtin subset: shell (PowerShell), read_file, write_file,
+  list_directory, web-search (DDGS x3).
+Custom: fetch_webpage(url) Playwright headless 15s, body text 10k cap;
+  take_screenshot() to %TEMP%/zia_screenshots/;
+  minimize_window(title) / maximize_window(title);
+  press_keys(keys) comma list: volumemute, volumeup, volumedown,
+  playpause, win, enter, ctrl,c etc.;
+  click_on_screen(desc) / type_on_screen(desc, text) vision grounding;
+  calculate(expr) safe AST (+ - * / ** xor neg);
+  search_web(query) DDGS Title/Snippet/Link x3;
+  read_file(path) / write_file(path, content, auto-opens on Win) /
+  list_directory(path, auto-opens on Win).
+  e.g. "Search Wikipedia for quantum mechanics and summarize it",
+  "Research latest NVidia stock price", "Find my resume PDF and
+  summarize skills", "List files in D:\Programming",
+  "Minimize all chrome windows and mute volume",
+  "Calculate 45 times 18 plus 7".
+
+-------------------------------------------------------------
+23. PROACTIVE MONITORING (core/proactive.py, auto, ~10s loop)
+-------------------------------------------------------------
+No command needed. RAM >90pct (5-min cooldown): "Sir, system memory
+is critically high at N percent. Should I close background
+processes?" CPU >95pct: "Sir, CPU usage has spiked to N percent."
+Waits while user_is_speaking.
+
+-------------------------------------------------------------
+24. PENDING YES/NO CONFIRMATIONS (core/pending.py interceptor)
+-------------------------------------------------------------
+Skills asking follow-ups ("Should I send it?") consume your NEXT
+utterance first, even during TTS, so "yes/proceed" is not misread
+as a new command. Unrelated speech still routes normally.
+
+-------------------------------------------------------------
+QUICK CHEAT SHEET
+-------------------------------------------------------------
+  "wake up Zia" | "go to sleep" | "shut down Zia" | "abort task" |
+  "shut up" | "help"
+  "what time is it" | "what day is it" | "what is the weather"
+  "open notepad/chrome/spotify/youtube/github" | "close chrome"
+  "snap chrome to the left/right" | "maximize VS Code"
+  "google <query>" | "play <song> on youtube"
+  "take a screenshot" | "what is on my screen?"
+  "click on the Submit button" | "type hello into the search bar" |
+  "go to the search bar" | "move mouse right by 200" | "press enter" |
+  "type hello world" | "write an essay about AI"
+  "read my clipboard" | "take a note that ..." | "remember ..."
+  "set a timer for 5 minutes" | "start DSA work" |
+  "get back to DSA work" | "lock my PC"
+
