@@ -1,39 +1,32 @@
 =============================================================
              ZIA ASSISTANT - COMPREHENSIVE COMMAND GUIDE
 =============================================================
-This file contains the complete list of commands, capabilities, and features built into Zia. 
+This file contains the complete list of commands, capabilities, and features built into Zia.
 
 -------------------------------------------------------------
-1. ZEN MODE (Lightning Speed & Cloud APIs)
+1. HYBRID ARCHITECTURE (Automatic Cloud & Local)
 -------------------------------------------------------------
-Zen Mode forces Zia to use a cascading chain of lightning-fast cloud APIs (Groq -> Gemini Flash -> OpenRouter) rather than local models, prioritizing extreme speed and accuracy for complex tasks.
-• "Go zen"
-• "Start zen mode"
-• "Switch"
-• "Initialize zen mode"
-• "Activate zen mode"
-• "Go to zen mode"
-*Note: Zia will automatically fall back to normal mode (Local) if networks drop or limits are reached.*
+Zia automatically uses a cascading chain of lightning-fast cloud APIs (Groq -> Gemini Flash -> OpenRouter). If all APIs fail or you lose internet connection, she will automatically fall back to local LLMs. There are no manual switches needed.
 
 -------------------------------------------------------------
 2. CORE SYSTEM & ASSISTANT CONTROL
 -------------------------------------------------------------
 • "Shut down Zia" / "Exit Zia" / "Quit Zia" -> Shuts down the assistant entirely.
-• "Go to sleep" / "Sleep Zia" -> Puts Zia into standby mode (waiting for wake word) and consolidates memories.
-• "Abort task" / "Stop what you are doing" / "Cancel task" -> Instantly cancels any stuck LLM process or background task.
-• "Who are you" / "What can you do" / "List commands" / "Help" -> Zia introduces herself and explains her capabilities.
+• "Go to sleep" / "Sleep Zia" -> Puts Zia into standby mode (waiting for wake word).
+• "Wake up" / "Wake up Zia" -> Awakens Zia from sleep.
+• "Abort task" / "Stop what you are doing" / "Cancel task" -> Instantly cancels any stuck process or background task.
+• "Who are you" / "What can you do" / "List commands" / "Help" -> Zia introduces herself and capabilities.
 
 -------------------------------------------------------------
 3. DATE, TIME, & WEATHER
 -------------------------------------------------------------
 • "What's the time" / "What time is it" / "Time" -> Tells the current local time.
-• "What's the date" / "What day is it" / "Date" -> Tells the current date and day of the week.
-• "What is the weather" / "Weather today" / "How is the weather" -> Fetches and reads the current local weather.
+• "What's the date" / "What day is it" / "Date" -> Tells the current date.
+• "What is the weather" / "Weather today" -> Fetches and reads current weather.
 
 -------------------------------------------------------------
 4. WORKSPACES & ROUTINES
 -------------------------------------------------------------
-Zia can instantly set up your entire coding environment (opening VS Code, specific folders, splitting terminals, opening browser tabs, etc.) based on predefined routines.
 • "Start DSA work" / "Open data structures" -> Sets up Leetcode and coding workspace.
 • "Start development" / "Open web dev" -> Sets up general development environment.
 • "Start Zia work" / "Open Zia" -> Opens the Zia project directory and environments.
@@ -42,78 +35,65 @@ Zia can instantly set up your entire coding environment (opening VS Code, specif
 -------------------------------------------------------------
 5. APP & WINDOW MANAGEMENT
 -------------------------------------------------------------
-• "Open [app name]" / "Launch [app]" / "Start [app]" -> Opens any installed application.
+• "Open [app name]" / "Launch [app]" -> Opens any installed application.
 • "Close [app name]" / "Quit [app]" -> Force closes an application.
-• "Snap [app] to the left" -> Snaps the specified window to the left half of the screen.
-• "Snap [app] to the right" -> Snaps the specified window to the right half of the screen.
-• "Maximize [app]" -> Maximizes and brings the specified window to the front.
+• "Snap [app] to the left" -> Snaps window to the left half.
+• "Snap [app] to the right" -> Snaps window to the right half.
+• "Maximize [app]" -> Maximizes and focuses the window.
 
 -------------------------------------------------------------
 6. MEDIA & AUDIO CONTROLS
 -------------------------------------------------------------
-• "Volume up" / "Louder" / "Turn it up" -> Increases system volume.
-• "Volume down" / "Quieter" / "Turn it down" -> Decreases system volume.
+• "Volume up" / "Louder" -> Increases system volume.
+• "Volume down" / "Quieter" -> Decreases system volume.
 • "Mute" / "Silence" / "Shut up" -> Mutes the system volume.
 • "Play" / "Pause" / "Resume" -> Controls media playback.
-• "Next" / "Skip" -> Skips to the next track/video.
-• "Previous" / "Go back" -> Goes to the previous track/video.
+• "Next" / "Skip" -> Skips track.
+• "Previous" / "Go back" -> Previous track.
 • "Stop" -> Stops media playback.
 
 -------------------------------------------------------------
 7. WEB SEARCH & BROWSING
 -------------------------------------------------------------
-• "Google [query]" / "Open a google search for [query]" -> Opens browser and searches Google.
-• "Play [query] on youtube" / "Find [query] on youtube" -> Opens YouTube and searches the query.
+• "Google [query]" / "Search google for [query]" -> Opens browser and searches Google.
+• "Play [query] on youtube" / "Find [query] on youtube" -> Opens YouTube and plays the exact video.
+• "Search Wikipedia for [query] and summarize" -> Silently fetches HTML and reads summary.
 
 -------------------------------------------------------------
+8. VISION, SCREENSHOTS & AUTONOMY
 -------------------------------------------------------------
-8. VISION & SCREENSHOTS & AUTONOMOUS COMPUTER USE
--------------------------------------------------------------
-• "Take a screenshot" / "Grab a screenshot" -> Captures the screen and saves it to a temp folder.
-• "What is on my screen?" / "Analyze my screen" -> Takes a screenshot and passes it to the Moondream Vision LLM, answering questions about what you are currently looking at.
-• "Click on the Submit button" (Zia takes a screenshot, finds the bounding box via Gemini, and clicks it)
-• "Type 'hello' into the search bar" (Zia finds the search bar, clicks it, and types)
+• "Take a screenshot" / "Grab a screenshot" -> Captures and saves the screen.
+• "What is on my screen?" / "Analyze my screen" -> Takes a screenshot and passes it to the Vision LLM to answer what you are looking at.
+• "Click on [element]" -> Zia takes a screenshot, finds the bounding box via vision grounding, and clicks it.
+• "Type [text] into [element]" -> Zia finds the element, clicks it, and types the text.
 
 -------------------------------------------------------------
+9. MOUSE & KEYBOARD
 -------------------------------------------------------------
-9. MOUSE, KEYBOARD & AUTOMATION
--------------------------------------------------------------
-• "Move mouse up/down/left/right by [amount]" -> Moves the cursor.
-• "Click" / "Double click" / "Right click" -> Clicks the mouse.
-• "Press [key]" -> Presses specific keys (Enter, Esc, Space, Tab, Backspace, Delete, Arrows).
-• "Type [text]" -> Literally types the dictated text via keyboard automation.
-• "Write an email/letter/paragraph about [topic]" -> Zia generates content using the LLM and automatically types it out into whatever window is currently focused.
+• "Move mouse up/down/left/right by [amount]" -> Moves cursor.
+• "Click" / "Double click" / "Right click" -> Mouse clicks.
+• "Press [key]" -> Presses specific keys (Enter, Esc, Space, etc).
+• "Type [text]" -> Types the dictated text.
+• "Write an essay/paragraph about [topic]" -> Zia generates content using the LLM and types it automatically.
 
 -------------------------------------------------------------
-10. CLIPBOARD MANAGEMENT
+10. CLIPBOARD & NOTES
 -------------------------------------------------------------
-• "Read my clipboard" -> Reads the current text content of your clipboard out loud.
-• "Save my clipboard (to notes)" -> Takes whatever text you copied and saves it into Zia's memory.
+• "Read my clipboard" -> Reads copied text.
+• "Save my clipboard" -> Saves copied text into memory.
+• "Take a note that [note]" / "Remember [fact]" -> Saves fact to vector DB.
 
 -------------------------------------------------------------
 11. TIMERS
 -------------------------------------------------------------
-• "Set a timer for [X] hours [Y] minutes [Z] seconds" -> Starts a background countdown timer that will alert you when finished.
+• "Set a timer for [X] hours [Y] minutes [Z] seconds" -> Starts background countdown.
 
 -------------------------------------------------------------
-12. MEMORY & PROACTIVE INTELLIGENCE
+12. MEMORY & NLP RAG
 -------------------------------------------------------------
-• "Take a note that [note]" / "Remember [fact]" / "Remind me to [task]" -> Explicitly saves a memory/fact into Zia's local vector database.
-• *Implicit Memory*: You can simply ask "What is my favorite color?" or "What was that command I copied earlier?". Zia uses NLP Entity Extraction to grab exact subjects, pulls relevant context from the RAG vector database, and dynamically injects it into the prompt.
+• *Implicit Memory*: You can ask "What is my favorite color?" or "What was that command?". Zia uses NLP Entity Extraction to grab exact subjects and pull context from the local RAG vector database.
 
 -------------------------------------------------------------
 13. AGENTNOVA (COMPLEX OS AUTONOMY)
 -------------------------------------------------------------
-If a command does not match any of the direct regex phrases above, Zia's "Brain" classifies it. If it is complex, she hands it off to AgentNova. AgentNova is an autonomous agent capable of utilizing OS tools to accomplish goals.
-Examples of things you can ask AgentNova to do:
-• "Delete the temporary files in my downloads folder."
-• "Read the file on my desktop called notes.txt and summarize it."
-• "Create a new text file on my desktop and write a python script for a calculator."
-• "Search Wikipedia for Quantum Mechanics, read the article, and give me a summary."
-• "Go to [url] and read the page to me."
-*(AgentNova requires confirmation before running dangerous commands like delete/format).*
-
--------------------------------------------------------------
-SYSTEM LOCK
--------------------------------------------------------------
-• "Lock PC" / "Lock screen" -> Immediately locks your Windows workstation.
+If a command does not match any regex phrases, Zia's Brain classifies it. If complex, AgentNova iteratively uses OS tools to solve the goal.

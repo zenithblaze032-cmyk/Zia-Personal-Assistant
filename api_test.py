@@ -18,7 +18,7 @@ except ImportError:
     genai = None
 
 print("====================================================")
-print("             ZEN MODE API DIAGNOSTICS               ")
+print("             HYBRID API DIAGNOSTICS               ")
 print("====================================================\n")
 
 def run_openai_compatible(name, base_url, api_key, model_name):

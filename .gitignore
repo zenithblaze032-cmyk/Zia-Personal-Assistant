@@ -25,4 +25,3 @@ memory.db-shm
 *.memory.db
 *.txt
 .pytest_cache/
-data/whatsapp_profiles

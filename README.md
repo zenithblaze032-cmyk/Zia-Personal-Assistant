@@ -4,7 +4,7 @@ A blazingly fast, hybrid AI-powered personal assistant built exclusively for Win
 
 ## 🚀 Core Features
 
-- **Hybrid Architecture**: Fast and accurate voice recognition powered by Google Speech API, while keeping text-to-speech (Piper) and LLM reasoning (Llama 3.2 via Ollama) 100% local on your machine for maximum privacy and performance.
+- **Hybrid Architecture**: Fast and accurate voice recognition powered by Google Speech API, while keeping text-to-speech (Piper) local. LLM reasoning cascades through ultra-fast cloud APIs (Groq, Gemini, OpenRouter) for maximum speed, and automatically falls back to local Llama 3.2 models for resilience and offline capability.
 - **AgentNova OS Integration**: Zia doesn't just talk; she acts. Powered by AgentKthx, she can minimize/maximize windows, control system volume, press hotkeys, manage files, and execute PowerShell commands.
 - **Headless Web Browsing**: Ask a question, and Zia will silently search the web, fetch the HTML, strip out the noise, and read you a concise summary of the page. Includes a **Watchdog Abort System**—just say "Abort task" to instantly cancel any stuck web search.
 - **Continuous Memory & NLP**: Uses `spaCy` to instantly perform NLP Entity Extraction on your speech. This gives the LLM absolute certainty on the subjects you are talking about, allowing it to instantly recall facts (like your name or preferences) from the local SQLite database without manual sleep triggers. 

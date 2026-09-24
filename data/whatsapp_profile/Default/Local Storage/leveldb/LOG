@@ -1,0 +1,6 @@
+2026/09/24-14:30:18.748 5020 Reusing MANIFEST d:\Development\Zia\data\whatsapp_profile\Default\Local Storage\leveldb/MANIFEST-000001
+2026/09/24-14:30:18.749 5020 Recovering log #3
+2026/09/24-14:30:18.751 5020 Reusing old log d:\Development\Zia\data\whatsapp_profile\Default\Local Storage\leveldb/000003.log 
+2026/09/24-14:30:41.267 948 Level-0 table #5: started
+2026/09/24-14:30:41.273 948 Level-0 table #5: 21044 bytes OK
+2026/09/24-14:30:41.276 948 Delete type=0 #3

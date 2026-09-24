@@ -109,18 +109,8 @@ def _handle_vision(match: re.Match, ctx: Context) -> None:
         from core.vision import capture_screen_bytes
         from core.state import st
 
-        if st.zen_mode:
-            from core.llm_zen import generate_zen_vision
-            vision_chat = generate_zen_vision
-        else:
-            from core.llm import generate_vision_chat
-            vision_chat = generate_vision_chat
-
-        query = "Describe what is on the screen briefly."
-        if match and "query" in match.groupdict() and match.group("query"):
-            query = match.group("query").strip()
-
-        img_bytes = capture_screen_bytes()
+        from core.llm import generate_vision_chat
+        vision_chat = generate_vision_chat
         response = vision_chat(query, img_bytes)
         ctx.say(response)
     except Exception as e:

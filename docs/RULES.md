@@ -1,7 +1,7 @@
 # Coding Rules — Zia
 
 ## 1. Project Principles
-- **Offline-first**: Zero cloud dependencies where possible. Run models locally via Ollama.
+- **Hybrid-first**: Use ultra-fast Cloud APIs first (via the fallback cascade in `llm.py`), fallback to Ollama locally.
 - **Fast & Quiet**: Fast path (regex) skills must execute in <1s.
 - **Safety First**: Autonomous file and shell tools must be guarded by confirmation state machines.
 
@@ -10,5 +10,5 @@
 - **Formatting**: Black + Ruff, line length 120.
 
 ## 3. Tool Usage Constraints
-- **AgentKthx**: Use only built-in tools. Do not write custom bash scripts inside agent instructions; use the native `shell` tool.
-- **EffGen**: Keep `use_tools=False` during intent classification to avoid hallucinated executions.
+- **AgentKthx**: Use only built-in tools.
+- **Vision**: Always use short, concise prompts for grounding coordinates to prevent HuggingFace models from hallucinating.

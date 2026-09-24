@@ -41,3 +41,6 @@ Follow these steps to manually verify Zia's subsystems after any codebase upgrad
 ## 8. Proactive Memory Consolidation (Phase 4)
 - **Action**: Tell Zia a personal fact, wait for her reply, then say "Go to sleep."
 - **Expected**: Zia enters the `ASLEEP` state. In the background, the console logs should show the `consolidate_memory` agent waking up, running the LLM against the short-term transcript, and extracting the fact to the RAG database (`Saved to LTM: ...`).
+
+## 9. Hybrid API & Fallback Cascade
+- **Action**: Disable your network adapter or forcefully set the API keys (e.g. GEMINI_API_KEY) to invalid strings. Say " Write a short poem about the ocean.\n

@@ -640,12 +640,67 @@ def _call_legacy(image, prompt: str, api_key: str) -> str | None:
     return None
 
 
+def _call_hf_grounding_model(image, prompt: str) -> str | None:
+    """Ask Hugging Face Qwen2-VL for a bounding box."""
+    hf_key = (os.environ.get("HUGGING_FACE_KEY") or "").strip()
+    if not hf_key:
+        return None
+    try:
+        from openai import OpenAI
+        import base64
+        import io
+        
+        client = OpenAI(base_url="https://api-inference.huggingface.co/v1/", api_key=hf_key)
+        
+        # Convert PIL image to base64
+        buf = io.BytesIO()
+        image.save(buf, format="JPEG", quality=85)
+        b64_img = base64.b64encode(buf.getvalue()).decode("utf-8")
+        
+        import re
+        desc_match = re.search(r"Target element:\s*(.*)", prompt)
+        description = desc_match.group(1).strip() if desc_match else "the UI element"
+        qwen_prompt = f"Find the bounding box of {description}."
+
+        messages = [
+            {
+                "role": "user",
+                "content": [
+                    {"type": "text", "text": qwen_prompt},
+                    {
+                        "type": "image_url",
+                        "image_url": {"url": f"data:image/jpeg;base64,{b64_img}"},
+                    },
+                ],
+            }
+        ]
+        
+        response = client.chat.completions.create(
+            model="Qwen/Qwen2-VL-7B-Instruct",
+            messages=messages,
+            max_tokens=256,
+            temperature=0.0
+        )
+        text = response.choices[0].message.content
+        if text:
+            log.debug("Screen: grounded with HuggingFace (Qwen2-VL)")
+            return text
+    except Exception as exc:
+        log.warning("Screen: HuggingFace vision failed: %s", _short_error(exc))
+    return None
+
+
 def _call_grounding_model(image, prompt: str) -> str | None:
     """
     Ask a vision model for a box, walking the model ladder.
 
     Returns raw response text, or None when grounding is unavailable.
     """
+    # Try Hugging Face first
+    hf_response = _call_hf_grounding_model(image, prompt)
+    if hf_response:
+        return hf_response
+
     api_key = _gemini_api_key()
     if not api_key:
         log.warning("Screen: GEMINI_API_KEY is not set; grounding unavailable")
@@ -996,7 +1051,7 @@ def type_into_element(
 #: Keyboard routes that focus a search / quick-switch field with no vision at
 #: all. Tried before grounding because they cannot mis-click.
 PROVIDER_SEARCH_KEYS: dict[str, tuple[str, ...]] = {
-    "whatsapp": ("ctrl", "k"),
+    "whatsapp": ("ctrl", "alt", "/"),
     "instagram": ("/",),
     "messenger": ("ctrl", "k"),
     "discord": ("ctrl", "k"),
@@ -1010,13 +1065,14 @@ def focus_search(provider: str, description: str | None = None
                  ) -> tuple[bool, str]:
     """
     Put the cursor in a messaging app's search field.
-
-    Prefers an exact keyboard shortcut, then grounding inside the app's search
-    region of interest, then a full-screen attempt.
+    
+    Prefers an exact keyboard shortcut, then falls back to vision grounding.
     """
     keys = PROVIDER_SEARCH_KEYS.get((provider or "").lower())
     if keys:
         try:
+            from core.screen import press_key
+            import time
             press_key(*keys)
             time.sleep(0.5)
             return True, f"Focused {provider} search with {'+'.join(keys)}."

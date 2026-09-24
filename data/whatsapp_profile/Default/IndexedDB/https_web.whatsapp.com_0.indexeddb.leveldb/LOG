@@ -1,0 +1,38 @@
+2026/09/24-14:30:19.250 d70 Reusing MANIFEST d:\Development\Zia\data\whatsapp_profile\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/MANIFEST-000001
+2026/09/24-14:30:19.250 d70 Recovering log #346
+2026/09/24-14:30:19.272 d70 Reusing old log d:\Development\Zia\data\whatsapp_profile\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/000346.log 
+2026/09/24-14:30:28.865 d70 Level-0 table #361: started
+2026/09/24-14:30:28.888 d70 Level-0 table #361: 1122421 bytes OK
+2026/09/24-14:30:28.891 d70 Delete type=0 #346
+2026/09/24-14:30:28.897 aec Compacting 1@0 + 0@1 files
+2026/09/24-14:30:28.942 aec Generated table #362@0: 33480 keys, 770506 bytes
+2026/09/24-14:30:28.942 aec Compacted 1@0 + 0@1 files => 770506 bytes
+2026/09/24-14:30:28.945 aec compacted to: files[ 0 1 10 0 0 0 0 ]
+2026/09/24-14:30:28.945 aec Delete type=2 #361
+2026/09/24-14:30:28.952 d70 Compacting 1@1 + 10@2 files
+2026/09/24-14:30:29.021 d70 Generated table #363@1: 80309 keys, 2239500 bytes
+2026/09/24-14:30:29.064 d70 Generated table #364@1: 46646 keys, 2205989 bytes
+2026/09/24-14:30:29.108 d70 Generated table #365@1: 49733 keys, 2213901 bytes
+2026/09/24-14:30:29.136 d70 Generated table #366@1: 971 keys, 2133794 bytes
+2026/09/24-14:30:29.170 d70 Generated table #367@1: 2471 keys, 2158256 bytes
+2026/09/24-14:30:29.202 d70 Generated table #368@1: 1645 keys, 2146931 bytes
+2026/09/24-14:30:29.247 d70 Generated table #369@1: 3192 keys, 2158930 bytes
+2026/09/24-14:30:29.297 d70 Generated table #370@1: 23385 keys, 2242994 bytes
+2026/09/24-14:30:29.341 d70 Generated table #371@1: 24588 keys, 2236212 bytes
+2026/09/24-14:30:29.378 d70 Generated table #372@1: 26567 keys, 1968500 bytes
+2026/09/24-14:30:29.378 d70 Compacted 1@1 + 10@2 files => 21705007 bytes
+2026/09/24-14:30:29.380 d70 compacted to: files[ 0 0 10 0 0 0 0 ]
+2026/09/24-14:30:29.380 d70 Delete type=2 #349
+2026/09/24-14:30:29.380 d70 Delete type=2 #350
+2026/09/24-14:30:29.380 d70 Delete type=2 #351
+2026/09/24-14:30:29.380 d70 Delete type=2 #352
+2026/09/24-14:30:29.380 d70 Delete type=2 #353
+2026/09/24-14:30:29.380 d70 Delete type=2 #354
+2026/09/24-14:30:29.380 d70 Delete type=2 #355
+2026/09/24-14:30:29.381 d70 Delete type=2 #356
+2026/09/24-14:30:29.381 d70 Delete type=2 #357
+2026/09/24-14:30:29.381 d70 Delete type=2 #358
+2026/09/24-14:30:29.381 d70 Delete type=2 #362
+2026/09/24-14:30:40.595 aec Level-0 table #374: started
+2026/09/24-14:30:40.618 aec Level-0 table #374: 1032516 bytes OK
+2026/09/24-14:30:40.619 aec Delete type=0 #360

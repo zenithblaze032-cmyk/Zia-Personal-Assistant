@@ -5,7 +5,7 @@ import re
 import time
 import requests
 import pyautogui
-from duckduckgo_search import DDGS
+from ddgs import DDGS
 import logging
 
 log = logging.getLogger("Zia.tools")

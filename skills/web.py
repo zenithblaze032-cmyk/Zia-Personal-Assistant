@@ -23,10 +23,24 @@ def _handle_google_search(match: re.Match, ctx: Context) -> None:
 
 def _handle_youtube_search(match: re.Match, ctx: Context) -> None:
     query = match.group("query").strip()
-    url = f"https://www.youtube.com/results?search_query={urllib.parse.quote(query)}"
     log.info("YouTube search: %r", query)
-    webbrowser.open(url)
     ctx.say(f"Playing {query} on YouTube, sir.")
+    
+    try:
+        import urllib.request
+        html = urllib.request.urlopen(f"https://www.youtube.com/results?search_query={urllib.parse.quote(query)}")
+        text = html.read().decode()
+        video_ids = re.findall(r"watch\?v=(\S{11})", text)
+        if video_ids:
+            # Open the direct video link so it automatically plays
+            url = f"https://www.youtube.com/watch?v={video_ids[0]}"
+        else:
+            url = f"https://www.youtube.com/results?search_query={urllib.parse.quote(query)}"
+    except Exception as e:
+        log.error("Failed to fetch YouTube video ID: %s", e)
+        url = f"https://www.youtube.com/results?search_query={urllib.parse.quote(query)}"
+        
+    webbrowser.open(url)
 
 
 # ---------------------------------------------------------------------------

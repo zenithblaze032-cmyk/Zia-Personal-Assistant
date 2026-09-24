@@ -1,25 +1,16 @@
 # Changelog
 
+## [0.5.0] - The Hybrid Cloud Architecture
+### Added
+- **Hybrid API Cascade**: Merged `llm.py` and `llm_zen.py` into a unified Hybrid API generator. Zia now automatically cascades through HuggingFace, Groq, Gemini, and OpenRouter for lightning-fast reasoning, and safely falls back to local Ollama if offline.
+### Removed
+- **Zen Mode**: Removed the manual voice toggle for Zen Mode. The system is now API-first by default.
+- **WhatsApp Messaging Automation**: Completely removed `whatsapp.py` and messaging dependencies as the browser automation proved too fragile for production use.
+### Fixed
+- **Vision Grounding**: Optimized grounding prompts for Qwen-VL to improve UI interaction accuracy.
+- **YouTube Search**: Upgraded YouTube skills to extract exact video IDs instead of opening search result pages.
+
 ## [0.4.1] - The Reliability & NLP Upgrade
 ### Added
-- Added **Watchdog Abort System**: A global abort event that can instantly cancel stuck AgentNova web searches or loops (say "abort task").
-- Added **Intent & Entity Extraction**: Created `core/nlp.py` using `spaCy` to instantly extract context from voice commands, providing the LLM with absolute certainty for memory retrieval.
-- Optimized **Deterministic-First Routing**: Sped up `brain.route_complexity()` by using deterministic heuristics instead of LLM generation for basic queries.
-
-## [0.4.0] - The Deep Integration Upgrade
-### Added
-- Implemented **Headless Web Browsing**: AgentNova can now fetch and summarize web pages.
-- Added **Deep OS Integration**: Added `pygetwindow` and `pyautogui` tools for window management (minimize/maximize) and system volume control.
-- Added **Proactive Intelligence**: A background agent triggered by the "Go to sleep" command automatically reads transcripts and consolidates facts into EffGen long-term memory.
-- Updated documentation across the repository and regenerated the Graphify project map.
-## [0.3.0] - The Agentic Upgrade
-### Added
-- Integrated **EffGen** for RAG long-term memory (`memory.db`) and intent classification.
-- Integrated **AgentKthx (Nova)** as an execution engine for complex OS-level and multi-step tasks.
-- Implemented a safety state machine that intercepts dangerous keywords (e.g., `delete`) and strictly requires verbal confirmation.
-- Optimized TTS interruption/barge-in handling.
-- Converted STT pipeline to support `agent-sdk-core` with Google Speech fallback.
-
-## [0.2.1] - Codebase Cleanup & Restructuring
-### Added
-- Created `docs/` folder to store PRD, Architecture, and Rules.
+- Added **Watchdog Abort System**: A global abort event that can instantly cancel stuck AgentNova web searches or loops.
+- Added **Intent & Entity Extraction**: Created `core/nlp.py` using `spaCy` to instantly extract context from voice commands.

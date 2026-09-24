@@ -41,20 +41,15 @@ class Brain:
             "Classify the following command into exactly one of three categories: "
             "SIMPLE, TOOL, or MULTI_STEP.\n\n"
             "Categories:\n"
-            "- SIMPLE: Basic questions, greetings, or things an LLM can answer directly.\n"
-            "- TOOL: Commands that require running exactly one specific tool (like weather, memory retrieval, open app).\n"
+            "- SIMPLE: Basic questions, greetings, memory retrieval, or things an LLM can answer directly.\n"
+            "- TOOL: Commands that require running exactly one specific tool (like weather, or opening an app).\n"
             "- MULTI_STEP: Complex requests needing multiple steps or AgentNova.\n\n"
             f"Command: '{text}'\n\n"
             "Reply ONLY with the category name (e.g. SIMPLE), nothing else."
         )
         
         try:
-            from core.state import st
-            if st.zen_mode:
-                from core.llm_zen import generate_zen_chat
-                result = generate_zen_chat([{"role": "user", "content": prompt}], use_tools=False)
-            else:
-                result = generate_chat([{"role": "user", "content": prompt}], use_tools=False)
+            result = generate_chat([{"role": "user", "content": prompt}], use_tools=False)
                 
             result = result.strip().upper()
             
